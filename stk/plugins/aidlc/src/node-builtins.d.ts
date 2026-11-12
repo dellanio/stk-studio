@@ -21,6 +21,10 @@ declare module 'node:path' {
   export const sep: string
 }
 
+declare module 'node:url' {
+  export function fileURLToPath(url: string | URL): string
+}
+
 declare module 'node:os' {
   export function tmpdir(): string
 }
