@@ -4,27 +4,28 @@ A versão do `aidlc-workflows` usada nos pilotos **não está confirmada**. O pl
 
 ## Onde fica o registro
 
-| Layout | Raiz | Versões |
-|---|---|---|
-| `aidlc-docs` | `aidlc-docs/aidlc-state.md` | 0.x–1.x; 2.x "flat legacy" |
-| `intent` | `aidlc/spaces/<space>/intents/<id>/aidlc-state.md` | 2.x (um registro por intenção) |
+| Layout       | Raiz                                               | Versões                        |
+| ------------ | -------------------------------------------------- | ------------------------------ |
+| `aidlc-docs` | `aidlc-docs/aidlc-state.md`                        | 0.x–1.x; 2.x "flat legacy"     |
+| `intent`     | `aidlc/spaces/<space>/intents/<id>/aidlc-state.md` | 2.x (um registro por intenção) |
 
 Delegações do STK ficam em `<raiz>/.stk/delegations.json` (para o layout `aidlc-docs`, `aidlc-docs/.stk/delegations.json`, como no brief).
 
 ## Perguntas (`*-questions.md`)
 
-| | `aidlc-v1` (0.x–1.x) | `aidlc-v2` (2.x) |
-|---|---|---|
-| Cabeçalho | `## Question 1` + texto na linha seguinte | `## Q1. [trade] Título` (o `[trade]` existe a partir da 2.11) |
-| Opções | `A) ...` separadas por linha em branco; "Other" é a última letra (pode ser `E)` ou `X)`) | `A. ...`; última é `X. Other (please specify)` |
-| Múltipla escolha | "(select all that apply)" no texto | idem |
-| Resposta gravada | `[Answer]: C` · múltipla `A, C` · outra `X) texto` | `[Answer]: B. <rótulo da opção>` · múltipla `A, C` · outra `X. texto` |
+|                  | `aidlc-v1` (0.x–1.x)                                                                     | `aidlc-v2` (2.x)                                                      |
+| ---------------- | ---------------------------------------------------------------------------------------- | --------------------------------------------------------------------- |
+| Cabeçalho        | `## Question 1` + texto na linha seguinte                                                | `## Q1. [trade] Título` (o `[trade]` existe a partir da 2.11)         |
+| Opções           | `A) ...` separadas por linha em branco; "Other" é a última letra (pode ser `E)` ou `X)`) | `A. ...`; última é `X. Other (please specify)`                        |
+| Múltipla escolha | "(select all that apply)" no texto                                                       | idem                                                                  |
+| Resposta gravada | `[Answer]: C` · múltipla `A, C` · outra `X) texto`                                       | `[Answer]: B. <rótulo da opção>` · múltipla `A, C` · outra `X. texto` |
 
 O parser é tolerante (aceita `##`–`####`, `Q1:`, `Question 1`, `A.`/`A)`, `**[Answer]:**`). Uma resposta vazia ou só com `_` conta como pendente. Blocos com `[Answer]:` e sem opções (ex.: `## Consolidated Summary Confirmation`) aparecem como pergunta de texto livre.
 
 **Escrita.** Só a linha `[Answer]:` da pergunta muda; o resto do arquivo (incluindo finais de linha CRLF/LF) é preservado byte a byte. Testado em `src/domain/aidlc-questions.test.ts`.
 
 **Suposições a confirmar.**
+
 1. Para "Outra resposta", v1 grava `X) texto` e v2 `X. texto`. A documentação só diz "descreva após a tag".
 2. Na v2, resposta única grava letra + rótulo (como nas fixtures do upstream); o protocolo também aceita só a letra.
 3. Perguntas embutidas em arquivos de plano (`*-plan.md`, v1) não são lidas: o brief limita a `*-questions.md`.

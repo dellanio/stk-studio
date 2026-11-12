@@ -20,12 +20,14 @@ O formato varia entre versões do `aidlc-workflows`. **A versão dos pilotos ain
 ## 3. Escopo do PoC
 
 ### 3.1 Perfis (C18)
+
 - Na primeira execução, o usuário escolhe o papel: **Dev** ou **PO** (lista extensível para N papéis). Pode trocar depois nas configurações.
 - Perfil é **experiência, não permissão**.
 - **Modo PO:** abre na Caixa de Entrada; worktrees, terminais, diffs, editor e catálogo técnico ficam ocultos.
 - **Ocultar UI do núcleo não é possível só com plugin.** Implementar o **menor patch possível** no núcleo (um mecanismo genérico de visibilidade de UI por perfil, reaproveitável pelo modo guiado) e registrá-lo em `stk/docs/patches.md`.
 
 ### 3.2 Painel AIDLC do dev (C17)
+
 - Detecta `aidlc-docs/` na workspace ativa.
 - Mostra:
   - fases (Inception / Construction / Operations) e etapas com progresso, a partir de `aidlc-state.md`;
@@ -36,6 +38,7 @@ O formato varia entre versões do `aidlc-workflows`. **A versão dos pilotos ain
 - Ação **"Avisar o agente para reler"**: envia ao agente da sessão um prompt curto pedindo para reler o arquivo de perguntas.
 
 ### 3.3 Caixa de Entrada do PO (C18)
+
 - Lista as perguntas pendentes delegadas ao PO **em todos os projetos dele**, com projeto, fase/etapa, quem pediu e há quanto tempo está esperando.
 - Responder grava no arquivo de perguntas e atualiza o status da delegação.
 - **Sem clonar repositório:** acesso via **API do GitHub** (contents API: ler o arquivo, gravar com commit em nome do usuário).
@@ -44,6 +47,7 @@ O formato varia entre versões do `aidlc-workflows`. **A versão dos pilotos ain
 - Linguagem de negócio na UI (ex.: "Fase de entendimento" para Inception).
 
 ### 3.4 Histórias → Jira (C19)
+
 - Ler as histórias geradas pelo AIDLC no inception. Implementar um adaptador; o caminho e o formato exatos dependem da versão e devem ser confirmados.
 - Tela de revisão: lista de histórias com critérios de aceite, edição, seleção.
 - Botão **"Lançar no Jira"**: cria um épico (opcional) e as histórias selecionadas, e grava as chaves do Jira de volta no artefato (ex.: `Jira: PROJ-123`) para rastreabilidade.
