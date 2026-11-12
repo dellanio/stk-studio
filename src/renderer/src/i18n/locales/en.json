@@ -25401,6 +25401,12 @@
         "group": "STK Studio",
         "title": "Profile",
         "description": "Changes what the app shows, not what you can do. Product Owner opens on the inbox and hides workspaces, terminals and diffs."
+      },
+      "search": {
+        "profile": "profile",
+        "role": "role",
+        "productOwner": "product owner",
+        "developer": "developer"
       }
     }
   }

@@ -31,7 +31,7 @@ export const UI_PROFILES: Record<UiProfileId, UiProfile> = {
 }
 
 export function isUiProfileId(value: unknown): value is UiProfileId {
-  return typeof value === 'string' && (UI_PROFILE_IDS as readonly string[]).includes(value)
+  return UI_PROFILE_IDS.some((id) => id === value)
 }
 
 /** Unset or unknown values behave as `dev`, Orca's own experience. */
@@ -53,6 +53,7 @@ export function findUiProfileHomeTabKey(
     return null
   }
   const suffix = `.${home.pluginId}/${home.panelId}`
-  const match = installedTabKeys.find((key) => key.startsWith('plugin:') && key.endsWith(suffix))
-  return (match as `plugin:${string}` | undefined) ?? null
+  const isHomeTab = (key: string): key is `plugin:${string}` =>
+    key.startsWith('plugin:') && key.endsWith(suffix)
+  return installedTabKeys.find(isHomeTab) ?? null
 }

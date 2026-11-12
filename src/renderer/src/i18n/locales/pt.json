@@ -24868,6 +24868,12 @@
         "group": "STK Studio",
         "title": "Perfil",
         "description": "Muda o que o app mostra, não o que você pode fazer. Product Owner abre na Caixa de Entrada e esconde workspaces, terminais e diffs."
+      },
+      "search": {
+        "profile": "perfil",
+        "role": "papel",
+        "productOwner": "product owner",
+        "developer": "desenvolvedor"
       }
     }
   }

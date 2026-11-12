@@ -2,8 +2,9 @@
 // unset; the choice can change later in Settings → General.
 import { useState } from 'react'
 import { useTranslate } from '@/i18n/use-translate'
+import { cn } from '@/lib/class-names'
 import { useAppStore } from '@/store'
-import type { UiProfileId } from '../../../../shared/ui-profiles'
+import { isUiProfileId, type UiProfileId } from '../../../../shared/ui-profiles'
 import { Button } from '../ui/button'
 import {
   Dialog,
@@ -13,7 +14,6 @@ import {
   DialogHeader,
   DialogTitle
 } from '../ui/dialog'
-import { Label } from '../ui/label'
 import { RadioGroup, RadioGroupItem } from '../ui/radio-group'
 import { useUiProfileOptions } from './ui-profile-options'
 
@@ -51,24 +51,30 @@ export function UiProfileFirstLaunchPicker({
           </DialogDescription>
         </DialogHeader>
         <RadioGroup
+          aria-label={t('stk.profile.picker.title', 'How will you use STK Studio?')}
           value={choice}
-          onValueChange={(value) => setChoice(value as UiProfileId)}
-          className="gap-2"
+          onValueChange={(value) => {
+            if (isUiProfileId(value)) {
+              setChoice(value)
+            }
+          }}
         >
           {options.map((option) => (
-            <Label
+            <div
               key={option.id}
-              htmlFor={`ui-profile-${option.id}`}
-              className="flex cursor-pointer items-start gap-3 rounded-md border border-border p-3 hover:bg-accent"
+              className={cn(
+                'min-w-0 rounded-md border border-border',
+                choice === option.id && 'bg-accent/50 text-accent-foreground'
+              )}
             >
-              <RadioGroupItem id={`ui-profile-${option.id}`} value={option.id} className="mt-0.5" />
-              <span className="flex flex-col gap-0.5">
-                <span className="text-sm font-medium">{option.label}</span>
-                <span className="text-xs font-normal text-muted-foreground">
-                  {option.description}
+              <label className="flex cursor-pointer items-start gap-3 p-3">
+                <RadioGroupItem value={option.id} className="mt-0.5" />
+                <span className="flex flex-col gap-0.5">
+                  <span className="text-sm font-medium">{option.label}</span>
+                  <span className="text-xs text-muted-foreground">{option.description}</span>
                 </span>
-              </span>
-            </Label>
+              </label>
+            </div>
           ))}
         </RadioGroup>
         <DialogFooter>
