@@ -10,6 +10,7 @@ import RightSidebar from '../components/right-sidebar/index'
 import { RecoverableRenderErrorBoundary } from '../components/error-boundaries/RecoverableRenderErrorBoundary'
 import { FloatingTerminalToggleButton } from '../components/floating-terminal/FloatingTerminalToggleButton'
 import { TerminalWorkbenchContainer } from '../components/TerminalWorkbenchContainer'
+import { UiProfileHome } from '../components/profiles/UiProfileHome'
 import type { VirtualizedScrollAnchor } from '../hooks/useVirtualizedScrollAnchor'
 import { TitlebarLeftControls } from './TitlebarLeftControls'
 import { RightSidebarToggle, TitlebarMainStrip } from './TitlebarMainStrip'
@@ -88,7 +89,13 @@ function PendingCreationSurface(props: {
 }
 
 function ActivePage({ layout }: { layout: AppChromeLayout }): React.JSX.Element {
-  const { activeView, hasActiveWorktree, activePendingCreationId, creationLayoutActive } = layout
+  const {
+    activeView,
+    hasActiveWorktree,
+    activePendingCreationId,
+    creationLayoutActive,
+    profileHomeActive
+  } = layout
   return (
     <>
       {activeView === 'settings' ? <Settings /> : null}
@@ -105,9 +112,13 @@ function ActivePage({ layout }: { layout: AppChromeLayout }): React.JSX.Element 
           reserveCollapsedSidebarHeaderSpace={layout.leftTitlebarChromeLayout.isFloating}
         />
       ) : null}
-      {activeView === 'terminal' && !hasActiveWorktree && !creationLayoutActive ? (
+      {activeView === 'terminal' &&
+      !hasActiveWorktree &&
+      !creationLayoutActive &&
+      !profileHomeActive ? (
         <Landing />
       ) : null}
+      {profileHomeActive ? <UiProfileHome /> : null}
     </>
   )
 }

@@ -88,6 +88,13 @@ const NON_UNIT_TEST_RUNNERS = [
     mirrors: ['readdirSync(EXAMPLES)']
   },
   {
+    // STK Studio (stk/docs/patches.md #2): `orca plugin test` for each stk/plugins plugin.
+    name: 'STK plugin tests (orca plugin test)',
+    include: ['stk/plugins/*/src/**/*.test.ts', 'stk/plugins/*/src/**/*.test.tsx'],
+    sources: ['src/cli/plugins/authoring/stk-plugin-tests.test.ts'],
+    mirrors: ['readdirSync(STK_PLUGINS)']
+  },
+  {
     name: 'docs site',
     include: ['docs/site/tests/*.test.mjs'],
     sources: ['docs/site/package.json'],

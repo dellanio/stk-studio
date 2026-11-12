@@ -25,6 +25,7 @@ A proposta tem cinco pontos:
 ## 2. Objetivos e não-objetivos
 
 ### Objetivos
+
 - Dar aos devs um **ADE pronto para uso** (zero config), com as ferramentas de IA do banco já integradas.
 - **Reduzir custo** de tokens (router para o bolsão, compactação de contexto, RTK).
 - **Padronizar o fluxo de trabalho com IA** (SDD / AIDLC) para todos os chapters.
@@ -32,6 +33,7 @@ A proposta tem cinco pontos:
 - **Sair do lock-in** de editor e de harness (Copilot hoje, Claude Code em breve, outros depois).
 
 ### Não-objetivos
+
 - **Não** substituir o VS Code como editor principal (edição pesada, debug e extensões de linguagem ficam nele).
 - **Não** manter sincronia contínua com o Orca oficial.
 - **Não** reescrever agentes/harnesses: usamos os CLIs existentes (Copilot CLI, Claude Code, Goose/OpenCode).
@@ -40,24 +42,24 @@ A proposta tem cinco pontos:
 
 ## 3. Inventário de features
 
-| # | Feature | Como entra | Camada |
-|---|---------|-----------|--------|
-| F1 | **Router de LLM** ("auto" próprio: Copilot ou bolsão de tokens) | Plugin (hook `agent.launch.before`) + gateway | Plugin + Sidecar |
-| F2 | **Compactação de contexto** (estilo Headroom) | Proxy local (Headroom, Apache 2.0) | Sidecar |
-| F3 | **Otimização de tool calling** (estilo RTK) | RTK (MIT) + plugin (hook `agent.tool.before`) | Sidecar + Plugin |
-| F4 | **Vault / second brain corporativo** pré-plugado | Servidores MCP pré-configurados | Sidecar + Config |
-| F5 | **Canal de update / novidades** | Painel "Novidades" + updater interno + catálogo interno | Plugin + Patch |
-| F6 | **Fluxo padrão SDD / AIDLC** | Painel wizard + skills + templates | Plugin + Skills |
-| F7 | **Migração do Squad Toolkit** | Reempacotado como skills, MCP e painéis | Plugin + Skills |
-| F8 | **Git nativo, visualização rápida de código e diffs** | Já existe no núcleo do Orca | Núcleo (sem mudança) |
-| F9 | **Botão "Abrir no VS Code"** para edição pesada e debug | Já existe (editores externos) + comando do plugin | Núcleo + Plugin |
-| F10 | **Multi-agente** (Copilot CLI hoje, Claude Code em breve) | Já existe no núcleo (worktrees em paralelo) | Núcleo |
-| F11 | **Plataforma plug-and-play agêntica** | Sistema de plugins + catálogo interno do F2A | Núcleo + Catálogo |
-| F12 | **Marca visual Bradesco / F2A** | Tema via plugin + nome, ícones e appId no build | Plugin + Patch |
-| F13 | **Zero config para o dev** | Plugins empacotados e pré-aprovados + bootstrap de sidecars | Patch + Plugin |
-| F14 | **Modo guiado** (primeira experiência para quem nunca usou IA) | Painel de onboarding com missões por trilha | Plugin |
-| F15 | **Dashboard de uso e economia** (tokens, router, adoção) | Painel + status bar | Plugin |
-| F16 | **Governança e segurança** (telemetria off, catálogo fechado, auditoria) | Patches de configuração + políticas do gateway | Patch + Sidecar |
+| #   | Feature                                                                  | Como entra                                                  | Camada               |
+| --- | ------------------------------------------------------------------------ | ----------------------------------------------------------- | -------------------- |
+| F1  | **Router de LLM** ("auto" próprio: Copilot ou bolsão de tokens)          | Plugin (hook `agent.launch.before`) + gateway               | Plugin + Sidecar     |
+| F2  | **Compactação de contexto** (estilo Headroom)                            | Proxy local (Headroom, Apache 2.0)                          | Sidecar              |
+| F3  | **Otimização de tool calling** (estilo RTK)                              | RTK (MIT) + plugin (hook `agent.tool.before`)               | Sidecar + Plugin     |
+| F4  | **Vault / second brain corporativo** pré-plugado                         | Servidores MCP pré-configurados                             | Sidecar + Config     |
+| F5  | **Canal de update / novidades**                                          | Painel "Novidades" + updater interno + catálogo interno     | Plugin + Patch       |
+| F6  | **Fluxo padrão SDD / AIDLC**                                             | Painel wizard + skills + templates                          | Plugin + Skills      |
+| F7  | **Migração do Squad Toolkit**                                            | Reempacotado como skills, MCP e painéis                     | Plugin + Skills      |
+| F8  | **Git nativo, visualização rápida de código e diffs**                    | Já existe no núcleo do Orca                                 | Núcleo (sem mudança) |
+| F9  | **Botão "Abrir no VS Code"** para edição pesada e debug                  | Já existe (editores externos) + comando do plugin           | Núcleo + Plugin      |
+| F10 | **Multi-agente** (Copilot CLI hoje, Claude Code em breve)                | Já existe no núcleo (worktrees em paralelo)                 | Núcleo               |
+| F11 | **Plataforma plug-and-play agêntica**                                    | Sistema de plugins + catálogo interno do F2A                | Núcleo + Catálogo    |
+| F12 | **Marca visual Bradesco / F2A**                                          | Tema via plugin + nome, ícones e appId no build             | Plugin + Patch       |
+| F13 | **Zero config para o dev**                                               | Plugins empacotados e pré-aprovados + bootstrap de sidecars | Patch + Plugin       |
+| F14 | **Modo guiado** (primeira experiência para quem nunca usou IA)           | Painel de onboarding com missões por trilha                 | Plugin               |
+| F15 | **Dashboard de uso e economia** (tokens, router, adoção)                 | Painel + status bar                                         | Plugin               |
+| F16 | **Governança e segurança** (telemetria off, catálogo fechado, auditoria) | Patches de configuração + políticas do gateway              | Patch + Sidecar      |
 
 ---
 
@@ -97,6 +99,7 @@ A proposta tem cinco pontos:
 ```
 
 ### Princípios
+
 1. **O núcleo não sabe que o F2A existe.** Tudo o que é F2A entra pelos pontos de extensão oficiais.
 2. **Infraestrutura de IA independe da interface.** Gateway, Headroom, RTK e MCP funcionam com o Orca F2A, com o VS Code ou com o CLI puro.
 3. **Contexto portável.** Skills, AGENTS.md e MCP valem para Copilot, Claude Code e qualquer agente futuro.
@@ -108,32 +111,32 @@ A proposta tem cinco pontos:
 
 Lido diretamente no código e na documentação do repositório (`docs/reference/plugin-*.md`). Esses são os pontos de extensão que usamos:
 
-| Recurso | Para que usamos |
-|---------|-----------------|
-| **Perfis de execução**: `data`, `declarative`, `sandboxed-ui`, `trusted-worker` | Tema (`data`); painéis (`sandboxed-ui`); router, RTK e integrações (`trusted-worker`) |
-| **Painéis** na barra lateral (HTML ou componentes TSX sem build) | SDD, Novidades, Onboarding, Dashboard, Squad |
-| **Worker** (processo Node separado, com API do host) | Lógica do router, leitura de settings e secrets, eventos de agentes |
-| **Hooks** (até 8 por plugin) | `agent.launch.before` (router), `agent.tool.before` (RTK), `agent.prompt.before` (contexto SDD), `workspace.create.after` (setup da worktree) |
-| **Eventos** | `agent.status.changed`, `workspace.created` (métricas e dashboard) |
-| **Status bar** | Agente/modelo ativo, tokens economizados, novidades não lidas |
-| **Settings declarados** | URL do gateway, política do router, trilha do dev |
-| **Secrets por plugin** | Credenciais do gateway e do bolsão |
-| **Temas** (app, terminal, ícones) e **language packs** | Marca visual e pt-BR |
-| **Catálogo próprio** (`orca plugin catalog add`), com commit fixo e hash SHA-256 verificado | Distribuição controlada dos plugins F2A |
-| **Plugins empacotados** (`bundled-plugins.json`) | Plugins F2A pré-instalados e pré-aprovados (zero config) |
-| **Aprovação + log de auditoria** | Rastreabilidade para segurança |
+| Recurso                                                                                     | Para que usamos                                                                                                                               |
+| ------------------------------------------------------------------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------- |
+| **Perfis de execução**: `data`, `declarative`, `sandboxed-ui`, `trusted-worker`             | Tema (`data`); painéis (`sandboxed-ui`); router, RTK e integrações (`trusted-worker`)                                                         |
+| **Painéis** na barra lateral (HTML ou componentes TSX sem build)                            | SDD, Novidades, Onboarding, Dashboard, Squad                                                                                                  |
+| **Worker** (processo Node separado, com API do host)                                        | Lógica do router, leitura de settings e secrets, eventos de agentes                                                                           |
+| **Hooks** (até 8 por plugin)                                                                | `agent.launch.before` (router), `agent.tool.before` (RTK), `agent.prompt.before` (contexto SDD), `workspace.create.after` (setup da worktree) |
+| **Eventos**                                                                                 | `agent.status.changed`, `workspace.created` (métricas e dashboard)                                                                            |
+| **Status bar**                                                                              | Agente/modelo ativo, tokens economizados, novidades não lidas                                                                                 |
+| **Settings declarados**                                                                     | URL do gateway, política do router, trilha do dev                                                                                             |
+| **Secrets por plugin**                                                                      | Credenciais do gateway e do bolsão                                                                                                            |
+| **Temas** (app, terminal, ícones) e **language packs**                                      | Marca visual e pt-BR                                                                                                                          |
+| **Catálogo próprio** (`orca plugin catalog add`), com commit fixo e hash SHA-256 verificado | Distribuição controlada dos plugins F2A                                                                                                       |
+| **Plugins empacotados** (`bundled-plugins.json`)                                            | Plugins F2A pré-instalados e pré-aprovados (zero config)                                                                                      |
+| **Aprovação + log de auditoria**                                                            | Rastreabilidade para segurança                                                                                                                |
 
 ### Limitações conhecidas (e como contornamos)
 
-| Limitação | Contorno |
-|-----------|----------|
-| `agent.prompt.before` **não intercepta prompts digitados pelo dev**, só os que o Orca envia | O contexto do second brain e do SDD entra por **MCP e skills**, não por hook |
-| `agent.tool.after` **não modifica a saída** da ferramenta | A compactação de saída fica no **RTK e no Headroom** (sidecar), não no hook |
-| Hook com mais de **2 s** é tratado como "passou" | O router decide com dados em cache (cota, regras); nenhuma chamada lenta antes de decidir |
-| Plugins `trusted-worker` pedem aprovação do usuário | No fork, os plugins F2A vêm **empacotados e pré-aprovados** |
-| Restaurar sessão salva **não passa** por `agent.launch.before` | O env do gateway também é configurado globalmente pelo bootstrap |
-| A API de plugins é **v1 e recente** | Escolher a tag base com cuidado (precisa de hooks e status bar, ≥ 1.4.248). Congelar a API é bom para a estabilidade |
-| Pontos `skills` e `mcpServers` no manifesto ainda são **reservados** | Skills e MCP são distribuídos pelo bootstrap do F2A até o formato ser definido |
+| Limitação                                                                                   | Contorno                                                                                                             |
+| ------------------------------------------------------------------------------------------- | -------------------------------------------------------------------------------------------------------------------- |
+| `agent.prompt.before` **não intercepta prompts digitados pelo dev**, só os que o Orca envia | O contexto do second brain e do SDD entra por **MCP e skills**, não por hook                                         |
+| `agent.tool.after` **não modifica a saída** da ferramenta                                   | A compactação de saída fica no **RTK e no Headroom** (sidecar), não no hook                                          |
+| Hook com mais de **2 s** é tratado como "passou"                                            | O router decide com dados em cache (cota, regras); nenhuma chamada lenta antes de decidir                            |
+| Plugins `trusted-worker` pedem aprovação do usuário                                         | No fork, os plugins F2A vêm **empacotados e pré-aprovados**                                                          |
+| Restaurar sessão salva **não passa** por `agent.launch.before`                              | O env do gateway também é configurado globalmente pelo bootstrap                                                     |
+| A API de plugins é **v1 e recente**                                                         | Escolher a tag base com cuidado (precisa de hooks e status bar, ≥ 1.4.248). Congelar a API é bom para a estabilidade |
+| Pontos `skills` e `mcpServers` no manifesto ainda são **reservados**                        | Skills e MCP são distribuídos pelo bootstrap do F2A até o formato ser definido                                       |
 
 ---
 
@@ -144,12 +147,14 @@ Lido diretamente no código e na documentação do repositório (`docs/reference
 **Problema:** o bolsão do parceiro serve os **mesmos modelos do Copilot a um custo menor**. Queremos decidir, por tarefa, se ela vai para o bolsão ou para o Copilot.
 
 **Onde a decisão acontece:** não dá para interceptar o "auto" interno do Copilot, porque as chamadas dele vão direto ao backend do GitHub. Por isso o router decide **qual agente iniciar e com qual configuração**, no hook `agent.launch.before`:
+
 - **Caminho Copilot:** inicia o Copilot CLI normalmente.
 - **Caminho bolsão:** inicia um agente agnóstico de modelo (Goose/OpenCode, ou Claude Code quando chegar) com `env` apontando para o gateway corporativo (via Headroom).
 
 **Sinais de decisão, em ordem de prioridade:**
+
 1. **Sensibilidade do repositório.** Repo classificado como sensível só usa provedores homologados para ele.
-2. **Cota do Copilot.** Se o contrato é por assento com cota incluída, a chamada ao Copilot custa zero na margem. O bolsão entra quando a cota aperta. *(Depende do modelo de cobrança do contrato; ver Decisões em aberto.)*
+2. **Cota do Copilot.** Se o contrato é por assento com cota incluída, a chamada ao Copilot custa zero na margem. O bolsão entra quando a cota aperta. _(Depende do modelo de cobrança do contrato; ver Decisões em aberto.)_
 3. **Tipo de tarefa.** Testes, documentação, explicação e refatoração local vão para o bolsão. Tarefa agêntica multi-arquivo e arquitetura vão para o Copilot (ajustável por métricas).
 4. **Fallback.** Falhou build, teste ou lint no caminho do bolsão: a tarefa sobe para o Copilot.
 
@@ -181,6 +186,7 @@ Lido diretamente no código e na documentação do repositório (`docs/reference
 ### F5 — Canal de update e novidades
 
 Três canais complementares:
+
 1. **Updater interno** do app: troca o feed de update do GitHub por um servidor do banco, com builds assinados pelo banco.
 2. **Catálogo interno de plugins:** novas versões dos plugins F2A sem precisar de uma nova versão do app.
 3. **Painel "Novidades" (`f2a.news`):** changelog, dicas, novas skills e missões, com badge na status bar. Funciona **nos dois sentidos**, com botão de feedback e registro de onde o dev travou.
@@ -188,6 +194,7 @@ Três canais complementares:
 ### F6 — Fluxo padrão SDD / AIDLC
 
 Painel wizard `f2a.sdd`:
+
 1. **Spec:** template guiado (contexto, critérios de aceite, restrições).
 2. **Plano:** agente gera o plano técnico, o dev revisa e aprova.
 3. **Tarefas:** quebra em tarefas, cada uma vira uma worktree.
@@ -224,18 +231,19 @@ Painel wizard `f2a.sdd`:
 
 ### F12 — Marca visual
 
-| Item | Onde | Mexe no núcleo? |
-|------|------|-----------------|
-| Cores (claro e escuro), editor, terminal | Plugin `f2a.theme` (`contributes.themes`, `terminalThemes`) | Não |
-| Ícones de arquivo | Plugin (`iconThemes`) | Não |
-| Fontes | Plugin (`contributes.fonts`) | Não |
-| pt-BR | Language pack (o Orca já tem pt-BR) | Não |
+| Item                                         | Onde                                                                              | Mexe no núcleo?         |
+| -------------------------------------------- | --------------------------------------------------------------------------------- | ----------------------- |
+| Cores (claro e escuro), editor, terminal     | Plugin `f2a.theme` (`contributes.themes`, `terminalThemes`)                       | Não                     |
+| Ícones de arquivo                            | Plugin (`iconThemes`)                                                             | Não                     |
+| Fontes                                       | Plugin (`contributes.fonts`)                                                      | Não                     |
+| pt-BR                                        | Language pack (o Orca já tem pt-BR)                                               | Não                     |
 | Nome do app, appId, ícone do app, instalador | `config/electron-builder.config.cjs` (`productName`, `appId`), `resources/build/` | Sim (patch de branding) |
-| Splash, logo na UI, textos "Orca" | Arquivos de recursos e i18n | Sim (patch de branding) |
+| Splash, logo na UI, textos "Orca"            | Arquivos de recursos e i18n                                                       | Sim (patch de branding) |
 
 ### F13 — Zero config
 
 Na primeira execução, o bootstrap do F2A:
+
 1. Instala e inicia os sidecars (Headroom, RTK, MCPs).
 2. Configura os agentes (MCP, skills, env do gateway, hooks do RTK).
 3. Fixa as versões dos CLIs dos agentes homologadas pelo F2A.
@@ -271,16 +279,16 @@ Disponibilidade de ferramenta não gera adoção sozinha. Quem nunca usou IA tra
 
 **Regra:** toda mudança no código do Orca entra nesta lista, com dono e justificativa. **Meta: no máximo ~10 patches**, reaplicáveis em poucos dias num re-fork.
 
-| # | Patch | Tipo |
-|---|-------|------|
-| P1 | Branding: `productName`, `appId`, ícones, instalador, splash | Troca |
-| P2 | Plugins F2A empacotados e pré-aprovados (`bundled-plugins.json`) | Configuração |
-| P3 | Catálogo interno como único; oficial e da comunidade removidos | Configuração |
-| P4 | Telemetria e crash reporting desligados e travados | Desligar |
-| P5 | Feed do updater apontando para o servidor interno + assinatura do banco | Troca |
-| P6 | Companion mobile e integrações não usadas desligados ou escondidos | Esconder |
-| P7 | Bootstrap dos sidecars F2A na inicialização | Adição mínima |
-| P8 | Política: plugins `trusted-worker` só do catálogo F2A | Configuração |
+| #   | Patch                                                                   | Tipo          |
+| --- | ----------------------------------------------------------------------- | ------------- |
+| P1  | Branding: `productName`, `appId`, ícones, instalador, splash            | Troca         |
+| P2  | Plugins F2A empacotados e pré-aprovados (`bundled-plugins.json`)        | Configuração  |
+| P3  | Catálogo interno como único; oficial e da comunidade removidos          | Configuração  |
+| P4  | Telemetria e crash reporting desligados e travados                      | Desligar      |
+| P5  | Feed do updater apontando para o servidor interno + assinatura do banco | Troca         |
+| P6  | Companion mobile e integrações não usadas desligados ou escondidos      | Esconder      |
+| P7  | Bootstrap dos sidecars F2A na inicialização                             | Adição mínima |
+| P8  | Política: plugins `trusted-worker` só do catálogo F2A                   | Configuração  |
 
 Todo o resto (router, RTK, SDD, novidades, onboarding, dashboard, tema, Squad) é **plugin ou sidecar**.
 
@@ -295,42 +303,48 @@ Todo o resto (router, RTK, SDD, novidades, onboarding, dashboard, tema, Squad) �
 
 **O que muda mesmo com o fork congelado** (e exige manutenção recorrente):
 
-| Dependência | Ação |
-|-------------|------|
-| Electron/Chromium (patches de segurança) | Upgrade planejado, trimestral |
-| CLIs dos agentes (Copilot CLI, Claude Code) | Versões fixadas pelo F2A e atualizadas só após testes de contrato |
-| SO e endpoint do banco | Testes nos perfis de máquina padrão |
-| Fluxos críticos | Testes E2E: criar worktree → agente → diff → commit → abrir no VS Code |
+| Dependência                                 | Ação                                                                   |
+| ------------------------------------------- | ---------------------------------------------------------------------- |
+| Electron/Chromium (patches de segurança)    | Upgrade planejado, trimestral                                          |
+| CLIs dos agentes (Copilot CLI, Claude Code) | Versões fixadas pelo F2A e atualizadas só após testes de contrato      |
+| SO e endpoint do banco                      | Testes nos perfis de máquina padrão                                    |
+| Fluxos críticos                             | Testes E2E: criar worktree → agente → diff → commit → abrir no VS Code |
 
 ---
 
 ## 9. Roadmap
 
 ### Fase 0 — Ganhos rápidos no ambiente atual (semanas 1 a 4)
+
 Serve para gerar valor e crédito político antes do Orca F2A existir.
+
 - RTK distribuído no VS Code + Copilot.
 - Primeiras skills do SDD e AGENTS.md por trilha.
 - MCP do second brain/vault em piloto.
 
 ### Fase 1 — PoC técnica (semanas 1 a 2, em paralelo à fase 0)
+
 - Fork na tag escolhida + patches P1 a P4.
 - Plugin de prova com um **painel SDD** e um **hook `agent.launch.before`** roteando entre o Copilot CLI e um agente apontando para o gateway.
 - Medir: linhas tocadas no núcleo e tempo de reaplicar os patches em outra tag.
 - **Em paralelo:** due diligence do bolsão (jurídico e compliance) e abertura da conversa com segurança da informação.
 
 ### Fase 2 — MVP para piloto (semanas 3 a 8)
+
 - Plugins `f2a.core` (router v1 por regras + RTK), `f2a.sdd`, `f2a.news`, `f2a.onboarding`, `f2a.theme`.
 - Sidecars: Headroom, gateway, MCPs.
 - Updater interno, catálogo interno, testes E2E.
 - **Piloto em 1 ou 2 tribes**, com chapter leads engajados.
 
 ### Fase 3 — Calibração (semanas 9 a 14)
+
 - Router calibrado com dados reais.
 - `f2a.dashboard`, `f2a.squad` (migração do Squad Toolkit).
 - Claude Code integrado (quando liberado).
 - Avaliação contra o gatilho de sucesso (seção 10).
 
 ### Fase 4 — Expansão (após o gatilho)
+
 - Rollout por ondas de tribes.
 - Time ampliado conforme o acordo com a liderança.
 - Catálogo aberto para outras áreas publicarem plugins.
@@ -341,28 +355,29 @@ Serve para gerar valor e crédito político antes do Orca F2A existir.
 
 **Baseline (coletar antes de tudo):** uso ativo semanal do Copilot hoje, por tribo.
 
-| Métrica | Definição |
-|---------|-----------|
-| Ativação | % de devs do piloto com o primeiro PR assistido |
-| Uso semanal | % de devs com pelo menos N sessões de agente por semana |
-| Tarefas concluídas | PRs assistidos por dev por mês |
-| Economia | Custo por tarefa concluída (antes × depois) e tokens economizados (Headroom + RTK) |
-| Qualidade | Taxa de fallback do router, retrabalho, PRs rejeitados |
-| Satisfação | NPS / feedback do painel de Novidades |
+| Métrica            | Definição                                                                          |
+| ------------------ | ---------------------------------------------------------------------------------- |
+| Ativação           | % de devs do piloto com o primeiro PR assistido                                    |
+| Uso semanal        | % de devs com pelo menos N sessões de agente por semana                            |
+| Tarefas concluídas | PRs assistidos por dev por mês                                                     |
+| Economia           | Custo por tarefa concluída (antes × depois) e tokens economizados (Headroom + RTK) |
+| Qualidade          | Taxa de fallback do router, retrabalho, PRs rejeitados                             |
+| Satisfação         | NPS / feedback do painel de Novidades                                              |
 
 **Gatilho para ampliar o time (a combinar com a liderança antes do piloto):**
+
 > Exemplo: ≥ X% de uso semanal e ≥ Y PRs assistidos por dev em 90 dias no piloto → entram N pessoas no time de plataforma.
 
 ---
 
 ## 11. Time e papéis
 
-| Papel | Fase piloto | Após o gatilho |
-|-------|-------------|----------------|
-| Engenharia de plataforma (fork, build, updater, E2E, Electron) | 2 | 3 a 4 |
-| Plugins e UX (SDD, onboarding, dashboard, novidades) | 1 a 2 | 2 a 3 |
-| IA/infra (gateway, router, Headroom, MCP) | 1 | 2 |
-| Adoção (F2A + chapter leads: missões, trilhas, feedback) | Time F2A atual | Time F2A atual |
+| Papel                                                          | Fase piloto    | Após o gatilho |
+| -------------------------------------------------------------- | -------------- | -------------- |
+| Engenharia de plataforma (fork, build, updater, E2E, Electron) | 2              | 3 a 4          |
+| Plugins e UX (SDD, onboarding, dashboard, novidades)           | 1 a 2          | 2 a 3          |
+| IA/infra (gateway, router, Headroom, MCP)                      | 1              | 2              |
+| Adoção (F2A + chapter leads: missões, trilhas, feedback)       | Time F2A atual | Time F2A atual |
 
 **Atenção:** sem um dono nomeado do fork, ele vira legado em poucos meses. O piloto deve ser **limitado ao que o time consegue sustentar**.
 
@@ -370,17 +385,17 @@ Serve para gerar valor e crédito político antes do Orca F2A existir.
 
 ## 12. Riscos
 
-| Risco | Impacto | Mitigação |
-|-------|---------|-----------|
-| Origem do bolsão (revenda × contrato legítimo), termos de uso, dados passando por terceiro | Alto (compliance BACEN/LGPD) | Due diligence antes de rotear qualquer código; Res. CMN 4.893 |
-| Homologação de segurança de um app Electron com acesso a shell e git | Alto | Conversa com segurança na fase 1; builds assinados; catálogo fechado |
-| Time pequeno para manter o fork | Alto | Núcleo intacto, patches mínimos, piloto limitado, gatilho de ampliação |
-| CLIs dos agentes mudando e quebrando adaptadores | Médio | Versões fixadas + testes de contrato |
-| Electron sem patch de segurança | Médio | Upgrade trimestral |
-| Adoção baixa entre quem nunca usou IA | Alto | Modo guiado, missões, chapter leads, métricas desde o dia 1 |
-| Escopo virar "reconstruir o VS Code" | Médio | Regra de escopo: edição pesada e debug = VS Code |
-| Prompt injection via contexto (vault, recipes, skills) | Médio | Fontes curadas, catálogo assinado, revisão de plugins |
-| Router opaco derrubando a confiança | Médio | Regras explícitas, logs, indicação visível do caminho usado |
+| Risco                                                                                      | Impacto                      | Mitigação                                                              |
+| ------------------------------------------------------------------------------------------ | ---------------------------- | ---------------------------------------------------------------------- |
+| Origem do bolsão (revenda × contrato legítimo), termos de uso, dados passando por terceiro | Alto (compliance BACEN/LGPD) | Due diligence antes de rotear qualquer código; Res. CMN 4.893          |
+| Homologação de segurança de um app Electron com acesso a shell e git                       | Alto                         | Conversa com segurança na fase 1; builds assinados; catálogo fechado   |
+| Time pequeno para manter o fork                                                            | Alto                         | Núcleo intacto, patches mínimos, piloto limitado, gatilho de ampliação |
+| CLIs dos agentes mudando e quebrando adaptadores                                           | Médio                        | Versões fixadas + testes de contrato                                   |
+| Electron sem patch de segurança                                                            | Médio                        | Upgrade trimestral                                                     |
+| Adoção baixa entre quem nunca usou IA                                                      | Alto                         | Modo guiado, missões, chapter leads, métricas desde o dia 1            |
+| Escopo virar "reconstruir o VS Code"                                                       | Médio                        | Regra de escopo: edição pesada e debug = VS Code                       |
+| Prompt injection via contexto (vault, recipes, skills)                                     | Médio                        | Fontes curadas, catálogo assinado, revisão de plugins                  |
+| Router opaco derrubando a confiança                                                        | Médio                        | Regras explícitas, logs, indicação visível do caminho usado            |
 
 ---
 
@@ -409,6 +424,7 @@ Serve para gerar valor e crédito político antes do Orca F2A existir.
 ---
 
 ### Referências
+
 - Orca: https://github.com/stablyai/orca — documentação de plugins em `docs/reference/plugin-*.md`
 - Headroom: https://github.com/chopratejas/headroom
 - RTK: https://github.com/rtk-ai/rtk

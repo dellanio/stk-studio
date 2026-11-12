@@ -5,6 +5,7 @@ import { useRepoById } from '@/store/repos/use-repository-catalog'
 import { isFolderRepo } from '../../../../shared/repo-kind'
 import { parseWorkspaceKey } from '../../../../shared/workspace-scope'
 import { getVisibleRightSidebarActivityItems } from './right-sidebar-activity-visibility'
+import { isUiSurfaceVisible } from '../../../../shared/ui-profiles'
 import { getPluginPanelActivityItems } from './plugin-panels/plugin-panel-activity-items'
 import {
   getPortsPanelOwnerKey,
@@ -59,6 +60,9 @@ export function useRightSidebarActivityItems({
     )
   )
   const pluginSystemEnabled = useAppStore((s) => s.settings?.pluginSystemEnabled === true)
+  const hideBuiltinTabs = useAppStore(
+    (s) => !isUiSurfaceVisible(s.settings?.uiProfile, 'right-sidebar-builtin-tabs')
+  )
   const pluginPanels = usePluginPanels()
   const visiblePluginPanels = useMemo(
     () => (pluginSystemEnabled ? pluginPanels : []),
@@ -142,9 +146,10 @@ export function useRightSidebarActivityItems({
       getVisibleRightSidebarActivityItems(activityItems, {
         isFolder,
         isFolderWorkspace,
-        hasSshHost
+        hasSshHost,
+        hideBuiltinTabs
       }),
-    [activityItems, isFolder, isFolderWorkspace, hasSshHost]
+    [activityItems, isFolder, isFolderWorkspace, hasSshHost, hideBuiltinTabs]
   )
 
   const activeFolderWorkspaceKey = isFolderWorkspace ? (activeWorktreeId ?? null) : null
