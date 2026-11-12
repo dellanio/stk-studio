@@ -15,7 +15,6 @@ import {
   ListItem,
   on,
   plugin,
-  Progress,
   read,
   RelativeTime,
   Row,
@@ -36,6 +35,7 @@ import type { DevLoadResult } from '../protocol'
 import type { QuestionFileView } from '../stores/aidlc-record-store'
 import { answerFromDraft, draftFromQuestion, QuestionForm, type AnswerDraft } from './question-form'
 import { errorMessage } from './panel-errors'
+import { ArtifactsTab, DelegationsTab, ProgressTab } from './dev-panel-sections'
 
 const data = atom<DevLoadResult | null>(null)
 const loading = atom(false)
@@ -119,7 +119,10 @@ function delegate(file: QuestionFileView, question: AidlcQuestion): void {
     ({ result, git }) => {
       set(data, result)
       set(delegating, null)
-      set(flash, { tone: git.pushed ? 'success' : 'warning', text: `${question.id} enviada ao PO. ${git.message}` })
+      set(flash, {
+        tone: git.pushed ? 'success' : 'warning',
+        text: `${question.id} enviada ao PO. ${git.message}`
+      })
     }
   )
 }
@@ -148,15 +151,26 @@ export function setup(ctx: PanelContext): void {
 
 function pendingDelegation(file: QuestionFileView, question: AidlcQuestion) {
   return read(data)?.snapshot?.delegations.find(
-    (item) => item.status === 'pending' && item.questionsFile === file.path && item.questionId === question.id
+    (item) =>
+      item.status === 'pending' &&
+      item.questionsFile === file.path &&
+      item.questionId === question.id
   )
 }
 
 function DelegateForm({ file, question }: { file: QuestionFileView; question: AidlcQuestion }) {
   return (
-    <Card title="Enviar ao PO" description="Grava a delegação em .stk/delegations.json e envia ao repositório.">
+    <Card
+      title="Enviar ao PO"
+      description="Grava a delegação em .stk/delegations.json e envia ao repositório."
+    >
       <Stack gap="sm">
-        <Input label="Para" placeholder="Nome do PO" value={read(delegateTo)} onChange={(value) => set(delegateTo, value)} />
+        <Input
+          label="Para"
+          placeholder="Nome do PO"
+          value={read(delegateTo)}
+          onChange={(value) => set(delegateTo, value)}
+        />
         <Textarea
           label="Observação (opcional)"
           rows={2}
@@ -176,7 +190,15 @@ function DelegateForm({ file, question }: { file: QuestionFileView; question: Ai
   )
 }
 
-function PendingQuestion({ file, question, first }: { file: QuestionFileView; question: AidlcQuestion; first: boolean }) {
+function PendingQuestion({
+  file,
+  question,
+  first
+}: {
+  file: QuestionFileView
+  question: AidlcQuestion
+  first: boolean
+}) {
   const key = keyOf(file.path, question.id)
   const delegation = pendingDelegation(file, question)
   return (
@@ -202,7 +224,13 @@ function PendingQuestion({ file, question, first }: { file: QuestionFileView; qu
           <DelegateForm file={file} question={question} />
         ) : (
           <Row justify="start">
-            <Button variant="outline" size="sm" icon="upload" disabled={read(busy)} onPress={() => startDelegation(file, question)}>
+            <Button
+              variant="outline"
+              size="sm"
+              icon="upload"
+              disabled={read(busy)}
+              onPress={() => startDelegation(file, question)}
+            >
               {delegation ? 'Reenviar ao PO' : 'Enviar ao PO'}
             </Button>
           </Row>
@@ -213,25 +241,48 @@ function PendingQuestion({ file, question, first }: { file: QuestionFileView; qu
 }
 
 function QuestionsTab({ files }: { files: QuestionFileView[] }) {
-  const withPending = files.filter((file) => file.questions.some((question) => question.rawAnswer === null))
+  const withPending = files.filter((file) =>
+    file.questions.some((question) => question.rawAnswer === null)
+  )
   const answered = files.flatMap((file) =>
-    file.questions.filter((question) => question.rawAnswer !== null).map((question) => ({ file, question }))
+    file.questions
+      .filter((question) => question.rawAnswer !== null)
+      .map((question) => ({ file, question }))
   )
   return (
     <Stack gap="md">
       {withPending.length === 0 ? (
-        <EmptyState icon="check" title="Nenhuma pergunta pendente" description="Todas as perguntas do workflow têm resposta." />
+        <EmptyState
+          icon="check"
+          title="Nenhuma pergunta pendente"
+          description="Todas as perguntas do workflow têm resposta."
+        />
       ) : null}
       {withPending.map((file, fileIndex) => (
-        <Card key={file.path} title={`${stageLabel(file.stage)} · ${phaseLabel(file.phase)}`} description={file.path}>
+        <Card
+          key={file.path}
+          title={`${stageLabel(file.stage)} · ${phaseLabel(file.phase)}`}
+          description={file.path}
+        >
           <Stack gap="sm">
             {file.questions
               .filter((question) => question.rawAnswer === null)
               .map((question, index) => (
-                <PendingQuestion key={question.id} file={file} question={question} first={fileIndex === 0 && index === 0} />
+                <PendingQuestion
+                  key={question.id}
+                  file={file}
+                  question={question}
+                  first={fileIndex === 0 && index === 0}
+                />
               ))}
             <Row justify="end">
-              <Button variant="ghost" size="sm" icon="agent" disabled={read(busy)} onPress={() => notifyAgent(file)}>
+              <Button
+                variant="ghost"
+                size="sm"
+                icon="agent"
+                disabled={read(busy)}
+                onPress={() => notifyAgent(file)}
+              >
                 Avisar o agente para reler
               </Button>
             </Row>
@@ -256,98 +307,13 @@ function QuestionsTab({ files }: { files: QuestionFileView[] }) {
   )
 }
 
-const STATUS_TONE = {
-  done: 'success',
-  'in-progress': 'accent',
-  'awaiting-approval': 'warning',
-  revising: 'warning',
-  pending: 'neutral',
-  skipped: 'neutral'
-} as const
-
-function ProgressTab({ result }: { result: DevLoadResult }) {
-  if (result.phases.length === 0) {
-    return <EmptyState icon="activity" title="Sem progresso registrado" description="aidlc-state.md ainda não tem etapas." />
-  }
-  return (
-    <Stack gap="md">
-      {result.currentStage ? <Text muted>{`Etapa atual: ${stageLabel(result.currentStage)}`}</Text> : null}
-      {result.phases.map((phase) => (
-        <Card key={phase.id} title={phase.label} description={`${phase.done} de ${phase.total} etapas concluídas`}>
-          <Stack gap="sm">
-            <Progress label={phase.label} labelHidden value={phase.percent} />
-            <List label={phase.label}>
-              {phase.stages.map((stage) => (
-                <ListItem key={stage.name} title={stage.label} description={stage.name}>
-                  <Badge tone={STATUS_TONE[stage.status]}>{stage.statusLabel}</Badge>
-                </ListItem>
-              ))}
-            </List>
-          </Stack>
-        </Card>
-      ))}
-    </Stack>
-  )
-}
-
-function ArtifactsTab({ result }: { result: DevLoadResult }) {
-  const artifacts = result.snapshot?.artifacts ?? []
-  if (artifacts.length === 0) {
-    return <EmptyState icon="file-text" title="Nenhum artefato gerado ainda" />
-  }
-  return (
-    <List label="Artefatos">
-      {artifacts.map((artifact) => (
-        <ListItem
-          key={artifact.path}
-          icon="file-text"
-          title={artifact.path.split('/').pop() ?? artifact.path}
-          description={`${phaseLabel(artifact.phase)} · ${stageLabel(artifact.stage)}`}
-          onPress={() => void run(() => plugin.request('dev.openFile', { recordRoot: recordRoot(), path: artifact.path }))}
-        />
-      ))}
-    </List>
-  )
-}
-
-function DelegationsTab({ result }: { result: DevLoadResult }) {
-  const delegations = [...(result.snapshot?.delegations ?? [])].reverse()
-  return (
-    <Stack gap="sm">
-      <Row justify="between">
-        <Text muted size="sm">
-          Respostas do PO chegam pelo repositório.
-        </Text>
-        <Button variant="outline" size="sm" icon="download" disabled={read(busy)} onPress={pull}>
-          Buscar respostas
-        </Button>
-      </Row>
-      {delegations.length === 0 ? (
-        <EmptyState icon="bell" title="Nada enviado ao PO" description="Use “Enviar ao PO” numa pergunta pendente." />
-      ) : (
-        <List label="Delegações">
-          {delegations.map((item) => (
-            <ListItem
-              key={item.id}
-              icon={item.status === 'answered' ? 'check' : 'bell'}
-              title={`${item.questionId} · ${item.questionTitle}`}
-              description={`${item.assignedTo} · pedida por ${item.requestedBy}`}
-            >
-              <Badge tone={item.status === 'answered' ? 'success' : item.status === 'pending' ? 'warning' : 'neutral'}>
-                {item.status === 'answered' ? 'Respondida' : item.status === 'pending' ? 'Aguardando' : 'Cancelada'}
-              </Badge>
-            </ListItem>
-          ))}
-        </List>
-      )}
-    </Stack>
-  )
-}
-
 export default function DevPanel() {
   const result = read(data)
   const files = result?.snapshot?.questionFiles ?? []
-  const pending = files.reduce((count, file) => count + file.questions.filter((q) => q.rawAnswer === null).length, 0)
+  const pending = files.reduce(
+    (count, file) => count + file.questions.filter((q) => q.rawAnswer === null).length,
+    0
+  )
   const message = read(flash)
   return (
     <Stack gap="md">
@@ -355,7 +321,12 @@ export default function DevPanel() {
         <Heading>AIDLC</Heading>
         <Row gap="xs">
           {pending > 0 ? <Badge tone="accent">{`${pending} pendente(s)`}</Badge> : null}
-          <IconButton icon="refresh" label="Atualizar" disabled={read(loading)} onPress={() => void load(recordRoot() || undefined)} />
+          <IconButton
+            icon="refresh"
+            label="Atualizar"
+            disabled={read(loading)}
+            onPress={() => void load(recordRoot() || undefined)}
+          />
         </Row>
       </Row>
       {read(failure) ? (
@@ -369,18 +340,26 @@ export default function DevPanel() {
         </Callout>
       ) : null}
       {read(loading) && !result ? <Spinner label="Lendo aidlc-docs" /> : null}
-      {result?.notice ? <EmptyState icon="layers" title="AIDLC" description={result.notice} /> : null}
+      {result?.notice ? (
+        <EmptyState icon="layers" title="AIDLC" description={result.notice} />
+      ) : null}
       {result?.snapshot ? (
         <Stack gap="md">
           {result.records.length > 1 ? (
             <Select
               label="Intenção"
               value={result.snapshot.record.root}
-              options={result.records.map((record) => ({ value: record.root, label: record.label }))}
+              options={result.records.map((record) => ({
+                value: record.root,
+                label: record.label
+              }))}
               onChange={(value) => void load(value)}
             />
           ) : (
-            <Text muted size="sm">{`${result.workspace?.name ?? ''} · ${result.snapshot.record.label}`}</Text>
+            <Text
+              muted
+              size="sm"
+            >{`${result.workspace?.name ?? ''} · ${result.snapshot.record.label}`}</Text>
           )}
           {result.snapshot.errors.length > 0 ? (
             <Callout tone="warning" title="Arquivos que não consegui ler">
@@ -395,10 +374,15 @@ export default function DevPanel() {
               <ProgressTab result={result} />
             </Tab>
             <Tab value="artifacts" label="Artefatos" icon="file-text">
-              <ArtifactsTab result={result} />
+              <ArtifactsTab
+                result={result}
+                onOpen={(path) =>
+                  void run(() => plugin.request('dev.openFile', { recordRoot: recordRoot(), path }))
+                }
+              />
             </Tab>
             <Tab value="delegations" label="PO" icon="bell">
-              <DelegationsTab result={result} />
+              <DelegationsTab result={result} busy={read(busy)} onPull={pull} />
             </Tab>
           </Tabs>
         </Stack>

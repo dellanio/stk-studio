@@ -3,7 +3,12 @@ import { fileURLToPath } from 'node:url'
 import { defineCheck } from 'orca/testing'
 
 const workspace = (dir: string) => ({
-  'workspace.readContext': { workspaceId: 'w1', branch: 'aidlc', displayName: 'reembolso', terminals: [] },
+  'workspace.readContext': {
+    workspaceId: 'w1',
+    branch: 'aidlc',
+    displayName: 'reembolso',
+    terminals: []
+  },
   'workspace.list': {
     workspaces: [
       {

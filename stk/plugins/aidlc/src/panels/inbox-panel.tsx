@@ -62,7 +62,14 @@ async function answer(item: InboxItem): Promise<void> {
   set(busy, true)
   set(failure, null)
   try {
-    set(inbox, await plugin.request('inbox.answer', { itemKey: item.key, answer: answerFromDraft(question, draft) }, { timeoutMs: 120_000 }))
+    set(
+      inbox,
+      await plugin.request(
+        'inbox.answer',
+        { itemKey: item.key, answer: answerFromDraft(question, draft) },
+        { timeoutMs: 120_000 }
+      )
+    )
     set(flash, `Resposta enviada para ${item.projectLabel}. O dev recebe pelo repositório.`)
   } catch (error) {
     set(failure, errorMessage(error))
@@ -97,7 +104,10 @@ export function setup(ctx: PanelContext): void {
 function PendingItem({ item }: { item: InboxItem }) {
   const question = item.question
   return (
-    <Card title={item.delegation.questionTitle} description={`${item.projectLabel} · ${item.phaseLabel} · ${item.stageLabel}`}>
+    <Card
+      title={item.delegation.questionTitle}
+      description={`${item.projectLabel} · ${item.phaseLabel} · ${item.stageLabel}`}
+    >
       <Stack gap="sm">
         <Text size="sm" muted>
           {`Pedida por ${item.delegation.requestedBy} · esperando há `}
@@ -109,7 +119,9 @@ function PendingItem({ item }: { item: InboxItem }) {
           </Callout>
         ) : null}
         {!question ? (
-          <Callout tone="warning">A pergunta não está mais no arquivo. Fale com o dev que pediu.</Callout>
+          <Callout tone="warning">
+            A pergunta não está mais no arquivo. Fale com o dev que pediu.
+          </Callout>
         ) : question.rawAnswer !== null ? (
           <Callout tone="success" icon="check" title="Já respondida no arquivo">
             {question.rawAnswer}
@@ -140,7 +152,13 @@ function PendingTab({ result }: { result: InboxResult }) {
     )
   }
   if (result.items.length === 0) {
-    return <EmptyState icon="check" title="Tudo respondido" description="Nenhuma pergunta aguardando você." />
+    return (
+      <EmptyState
+        icon="check"
+        title="Tudo respondido"
+        description="Nenhuma pergunta aguardando você."
+      />
+    )
   }
   return (
     <Stack gap="md">
@@ -200,10 +218,25 @@ function ConfigTab() {
     <Stack gap="md">
       <KeyValue
         items={[
-          { label: 'Modo demonstração', value: status.demo ? 'Ligado' : 'Desligado', tone: status.demo ? 'warning' : 'neutral' },
-          { label: 'Projetos', value: status.projects.length > 0 ? status.projects.join(', ') : 'Nenhum' },
-          { label: 'Token do GitHub', value: status.githubTokenSet ? 'Configurado' : 'Não configurado', tone: status.githubTokenSet ? 'success' : 'warning' },
-          { label: 'Token do Jira', value: status.jiraTokenSet ? 'Configurado' : 'Não configurado', tone: status.jiraTokenSet ? 'success' : 'neutral' }
+          {
+            label: 'Modo demonstração',
+            value: status.demo ? 'Ligado' : 'Desligado',
+            tone: status.demo ? 'warning' : 'neutral'
+          },
+          {
+            label: 'Projetos',
+            value: status.projects.length > 0 ? status.projects.join(', ') : 'Nenhum'
+          },
+          {
+            label: 'Token do GitHub',
+            value: status.githubTokenSet ? 'Configurado' : 'Não configurado',
+            tone: status.githubTokenSet ? 'success' : 'warning'
+          },
+          {
+            label: 'Token do Jira',
+            value: status.jiraTokenSet ? 'Configurado' : 'Não configurado',
+            tone: status.jiraTokenSet ? 'success' : 'neutral'
+          }
         ]}
       />
       {!status.secretsAvailable ? (
@@ -211,24 +244,47 @@ function ConfigTab() {
           Sem chaveiro do sistema operacional, os tokens não podem ser guardados com segurança.
         </Callout>
       ) : null}
-      <Card title="Token do GitHub" description="Precisa de leitura e escrita de conteúdo nos repositórios dos projetos.">
+      <Card
+        title="Token do GitHub"
+        description="Precisa de leitura e escrita de conteúdo nos repositórios dos projetos."
+      >
         <Row gap="xs">
-          <Input label="Token do GitHub" labelHidden type="password" placeholder="ghp_…" value={read(githubToken)} onChange={(value) => set(githubToken, value)} />
-          <Button disabled={read(busy) || !status.secretsAvailable} onPress={() => void saveSecret('githubToken')}>
+          <Input
+            label="Token do GitHub"
+            labelHidden
+            type="password"
+            placeholder="ghp_…"
+            value={read(githubToken)}
+            onChange={(value) => set(githubToken, value)}
+          />
+          <Button
+            disabled={read(busy) || !status.secretsAvailable}
+            onPress={() => void saveSecret('githubToken')}
+          >
             Salvar
           </Button>
         </Row>
       </Card>
       <Card title="Token do Jira" description="Usado por “Lançar no Jira”.">
         <Row gap="xs">
-          <Input label="Token do Jira" labelHidden type="password" value={read(jiraToken)} onChange={(value) => set(jiraToken, value)} />
-          <Button disabled={read(busy) || !status.secretsAvailable} onPress={() => void saveSecret('jiraToken')}>
+          <Input
+            label="Token do Jira"
+            labelHidden
+            type="password"
+            value={read(jiraToken)}
+            onChange={(value) => set(jiraToken, value)}
+          />
+          <Button
+            disabled={read(busy) || !status.secretsAvailable}
+            onPress={() => void saveSecret('jiraToken')}
+          >
             Salvar
           </Button>
         </Row>
       </Card>
       <Text size="xs" muted>
-        Projetos, intervalo de verificação e campos do Jira ficam em Configurações → Plugins → STK AIDLC.
+        Projetos, intervalo de verificação e campos do Jira ficam em Configurações → Plugins → STK
+        AIDLC.
       </Text>
     </Stack>
   )
@@ -243,7 +299,12 @@ export default function InboxPanel() {
         <Heading>Caixa de Entrada</Heading>
         <Row gap="xs">
           {result?.demo ? <Badge tone="warning">Demonstração</Badge> : null}
-          <IconButton icon="refresh" label="Verificar agora" disabled={read(loading)} onPress={() => void load(true)} />
+          <IconButton
+            icon="refresh"
+            label="Verificar agora"
+            disabled={read(loading)}
+            onPress={() => void load(true)}
+          />
         </Row>
       </Row>
       {result?.checkedAt ? (

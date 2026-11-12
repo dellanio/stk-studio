@@ -22,16 +22,16 @@ export type Delegation = {
 
 export type DelegationLedger = { version: 1; delegations: Delegation[] }
 
-export const EMPTY_LEDGER: DelegationLedger = { version: 1, delegations: [] }
-
 export function parseLedger(text: string | null): DelegationLedger {
   if (!text?.trim()) {
     return { version: 1, delegations: [] }
   }
   const parsed: unknown = JSON.parse(text)
   const list =
-    typeof parsed === 'object' && parsed !== null && Array.isArray((parsed as { delegations?: unknown }).delegations)
-      ? ((parsed as { delegations: unknown[] }).delegations)
+    typeof parsed === 'object' &&
+    parsed !== null &&
+    Array.isArray((parsed as { delegations?: unknown }).delegations)
+      ? (parsed as { delegations: unknown[] }).delegations
       : []
   const delegations = list.filter(
     (item): item is Delegation =>
@@ -58,7 +58,10 @@ export function addDelegation(
   newId: () => string
 ): { ledger: DelegationLedger; delegation: Delegation } {
   const existing = ledger.delegations.find(
-    (item) => item.status === 'pending' && item.questionsFile === input.questionsFile && item.questionId === input.questionId
+    (item) =>
+      item.status === 'pending' &&
+      item.questionsFile === input.questionsFile &&
+      item.questionId === input.questionId
   )
   const delegation: Delegation = existing
     ? { ...existing, ...input, requestedAt: now.toISOString() }
@@ -77,7 +80,9 @@ export function markAnswered(
   return {
     version: 1,
     delegations: ledger.delegations.map((item) =>
-      item.status === 'pending' && item.questionsFile === question.questionsFile && item.questionId === question.questionId
+      item.status === 'pending' &&
+      item.questionsFile === question.questionsFile &&
+      item.questionId === question.questionId
         ? { ...item, status: 'answered', answeredBy, answeredAt: now.toISOString() }
         : item
     )

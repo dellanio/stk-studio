@@ -12,9 +12,21 @@ test('v1 state: phases, stage plans and progress', () => {
     ['inception', 'construction', 'operations']
   )
   const inception = state.phases[0]
-  assert.deepEqual(inception.stages[1], { name: 'Reverse Engineering', status: 'skipped', plan: null })
-  assert.deepEqual(inception.stages[3], { name: 'User Stories', status: 'pending', plan: 'EXECUTE' })
-  assert.deepEqual(inception.stages[6], { name: 'Units Generation', status: 'skipped', plan: 'SKIP' })
+  assert.deepEqual(inception.stages[1], {
+    name: 'Reverse Engineering',
+    status: 'skipped',
+    plan: null
+  })
+  assert.deepEqual(inception.stages[3], {
+    name: 'User Stories',
+    status: 'pending',
+    plan: 'EXECUTE'
+  })
+  assert.deepEqual(inception.stages[6], {
+    name: 'Units Generation',
+    status: 'skipped',
+    plan: 'SKIP'
+  })
   assert.deepEqual(phaseProgress(inception), { done: 3, total: 5, percent: 60 })
   assert.equal(state.currentStage, 'INCEPTION - User Stories')
 })

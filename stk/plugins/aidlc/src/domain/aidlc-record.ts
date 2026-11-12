@@ -36,7 +36,11 @@ export const RECORD_SCAN_ROOTS = ['aidlc-docs', 'aidlc/spaces'] as const
 
 export function classifyRecordFile(relativePath: string): AidlcRecordFileKind {
   const name = relativePath.split('/').pop() ?? relativePath
-  if (relativePath.startsWith('.stk/') || relativePath.startsWith('.aidlc-engine/') || name.startsWith('.')) {
+  if (
+    relativePath.startsWith('.stk/') ||
+    relativePath.startsWith('.aidlc-engine/') ||
+    name.startsWith('.')
+  ) {
     return 'internal'
   }
   if (relativePath === STATE_FILE) {
@@ -55,7 +59,10 @@ export function classifyRecordFile(relativePath: string): AidlcRecordFileKind {
 }
 
 /** `inception/requirements-analysis/x-questions.md` → phase `inception`, stage `requirements-analysis`. */
-export function stageOfRecordFile(relativePath: string): { phase: string | null; stage: string | null } {
+export function stageOfRecordFile(relativePath: string): {
+  phase: string | null
+  stage: string | null
+} {
   const parts = relativePath.split('/')
   if (parts.length < 2) {
     return { phase: null, stage: null }

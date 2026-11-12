@@ -44,7 +44,10 @@ test('v2 stories: US/AC ids', () => {
 
 test('Jira keys go back into the artifact, replace older ones and change nothing else', () => {
   const before = fixture(V1)
-  const once = writeJiraKeys(before, { stories: { 'US-001': 'FIN-11', 'US-003': 'FIN-12' }, epic: 'FIN-10' })
+  const once = writeJiraKeys(before, {
+    stories: { 'US-001': 'FIN-11', 'US-003': 'FIN-12' },
+    epic: 'FIN-10'
+  })
   const doc = parseStories(once)
   assert.equal(doc.epicJiraKey, 'FIN-10')
   assert.deepEqual(

@@ -14,18 +14,34 @@ async function checkout(): Promise<string> {
   for (const path of ['aidlc-state.md', QUESTIONS]) {
     const target = join(dir, 'aidlc-docs', ...path.split('/'))
     await mkdir(dirname(target), { recursive: true })
-    await writeFile(target, readFileSync(new URL(`../../fixtures/v1/aidlc-docs/${path}`, import.meta.url), 'utf8'), 'utf8')
+    await writeFile(
+      target,
+      readFileSync(new URL(`../../fixtures/v1/aidlc-docs/${path}`, import.meta.url), 'utf8'),
+      'utf8'
+    )
   }
   return dir
 }
 
 function host(dir: string) {
   return mockHost({
-    settings: { userName: 'Dev Teste', defaultPo: 'Ana PO', pushDelegations: false, pollMinutes: 60 },
+    settings: {
+      userName: 'Dev Teste',
+      defaultPo: 'Ana PO',
+      pushDelegations: false,
+      pollMinutes: 60
+    },
     results: {
-      'workspace.readContext': { workspaceId: 'w1', branch: 'main', displayName: 'reembolso', terminals: [] },
+      'workspace.readContext': {
+        workspaceId: 'w1',
+        branch: 'main',
+        displayName: 'reembolso',
+        terminals: []
+      },
       'workspace.list': {
-        workspaces: [{ id: 'w1', kind: 'folder', name: 'reembolso', path: dir, branch: null, hostId: 'local' }],
+        workspaces: [
+          { id: 'w1', kind: 'folder', name: 'reembolso', path: dir, branch: null, hostId: 'local' }
+        ],
         truncated: false
       }
     }
@@ -59,11 +75,21 @@ test('dev answers in the form and sends a question to the PO, all in the checkou
     assert.equal(git.committed, false)
     assert.match(git.message, /não é um repositório git/)
 
-    const file = parseQuestions(await readFile(join(dir, 'aidlc-docs', ...QUESTIONS.split('/')), 'utf8'))
+    const file = parseQuestions(
+      await readFile(join(dir, 'aidlc-docs', ...QUESTIONS.split('/')), 'utf8')
+    )
     assert.equal(file.questions[2].rawAnswer, 'A, B')
-    const ledger = parseLedger(await readFile(join(dir, 'aidlc-docs', '.stk', 'delegations.json'), 'utf8'))
+    const ledger = parseLedger(
+      await readFile(join(dir, 'aidlc-docs', '.stk', 'delegations.json'), 'utf8')
+    )
     assert.deepEqual(
-      ledger.delegations.map((item) => [item.questionId, item.assignedTo, item.requestedBy, item.status, item.note]),
+      ledger.delegations.map((item) => [
+        item.questionId,
+        item.assignedTo,
+        item.requestedBy,
+        item.status,
+        item.note
+      ]),
       [['Q2', 'Ana PO', 'Dev Teste', 'pending', 'Precisa do financeiro?']]
     )
     assert.deepEqual(

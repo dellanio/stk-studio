@@ -47,7 +47,8 @@ export type RecordSnapshot = {
   errors: RecordFileError[]
 }
 
-const recordPath = (record: AidlcRecordRef, relative: string): string => `${record.root}/${relative}`
+const recordPath = (record: AidlcRecordRef, relative: string): string =>
+  `${record.root}/${relative}`
 
 function message(error: unknown): string {
   return error instanceof Error ? error.message : String(error)
@@ -66,7 +67,9 @@ export async function loadRecordSnapshot(
   record: AidlcRecordRef,
   format?: AidlcQuestionsFormatId
 ): Promise<RecordSnapshot> {
-  const files = (await source.listFiles(record.root)).map((path) => path.slice(record.root.length + 1))
+  const files = (await source.listFiles(record.root)).map((path) =>
+    path.slice(record.root.length + 1)
+  )
   const snapshot: RecordSnapshot = {
     record,
     state: null,
@@ -86,7 +89,11 @@ export async function loadRecordSnapshot(
       } else if (kind === 'questions') {
         const file = await source.readFile(recordPath(record, relative))
         if (file) {
-          snapshot.questionFiles.push({ ...parseQuestions(file.content, format), path: relative, ...where })
+          snapshot.questionFiles.push({
+            ...parseQuestions(file.content, format),
+            path: relative,
+            ...where
+          })
         }
       } else if (kind === 'stories') {
         snapshot.storiesFiles.push(relative)
@@ -158,11 +165,16 @@ export async function delegateQuestion(
   now = new Date()
 ): Promise<Delegation> {
   let created: Delegation | null = null
-  await updateLedger(source, record, `aidlc: ${input.questionId} enviada a ${input.assignedTo}`, (ledger) => {
-    const result = addDelegation(ledger, input, now, randomUUID)
-    created = result.delegation
-    return result.ledger
-  })
+  await updateLedger(
+    source,
+    record,
+    `aidlc: ${input.questionId} enviada a ${input.assignedTo}`,
+    (ledger) => {
+      const result = addDelegation(ledger, input, now, randomUUID)
+      created = result.delegation
+      return result.ledger
+    }
+  )
   return created as unknown as Delegation
 }
 
@@ -184,8 +196,11 @@ export async function resolveDelegations(
   if (!pending) {
     return false
   }
-  await updateLedger(source, record, `aidlc: delegação de ${question.questionId} respondida por ${answeredBy}`, (current) =>
-    markAnswered(current, question, answeredBy, now)
+  await updateLedger(
+    source,
+    record,
+    `aidlc: delegação de ${question.questionId} respondida por ${answeredBy}`,
+    (current) => markAnswered(current, question, answeredBy, now)
   )
   return true
 }

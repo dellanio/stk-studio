@@ -20,7 +20,9 @@ export async function startFakeGitHub(options: {
 }): Promise<FakeGitHub> {
   let next = 1
   const sha = (): string => `sha${next++}`
-  const files = new Map(Object.entries(options.files).map(([path, content]) => [path, { content, sha: sha() }]))
+  const files = new Map(
+    Object.entries(options.files).map(([path, content]) => [path, { content, sha: sha() }])
+  )
   const commits: FakeGitHub['commits'] = []
   const prefix = `/repos/${options.owner}/${options.repo}`
 
@@ -41,7 +43,10 @@ export async function startFakeGitHub(options: {
     }
     const rest = url.pathname.slice(prefix.length)
     if (req.method === 'GET' && rest === `/git/trees/${options.branch}`) {
-      send(res, 200, { truncated: false, tree: [...files.keys()].map((path) => ({ path, type: 'blob' })) })
+      send(res, 200, {
+        truncated: false,
+        tree: [...files.keys()].map((path) => ({ path, type: 'blob' }))
+      })
       return
     }
     if (!rest.startsWith('/contents/')) {
@@ -55,11 +60,22 @@ export async function startFakeGitHub(options: {
         send(res, 404, { message: 'Not Found' })
         return
       }
-      send(res, 200, { type: 'file', path, sha: file.sha, encoding: 'base64', content: b64(file.content) })
+      send(res, 200, {
+        type: 'file',
+        path,
+        sha: file.sha,
+        encoding: 'base64',
+        content: b64(file.content)
+      })
       return
     }
     if (req.method === 'PUT') {
-      const input = JSON.parse(body) as { message: string; content: string; sha?: string; branch: string }
+      const input = JSON.parse(body) as {
+        message: string
+        content: string
+        sha?: string
+        branch: string
+      }
       if (input.branch !== options.branch) {
         send(res, 404, { message: 'Branch not found' })
         return

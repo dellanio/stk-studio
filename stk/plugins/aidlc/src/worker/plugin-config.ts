@@ -17,7 +17,8 @@ export type PluginConfig = {
   jira: Omit<JiraConfig, 'token'>
 }
 
-const text = (value: unknown, fallback = ''): string => (typeof value === 'string' ? value.trim() : fallback)
+const text = (value: unknown, fallback = ''): string =>
+  typeof value === 'string' ? value.trim() : fallback
 
 export async function readConfig(orca: OrcaWorkerApi): Promise<PluginConfig> {
   const settings = (await orca.settings.get()) as Record<string, unknown>
@@ -64,7 +65,10 @@ export async function readConfig(orca: OrcaWorkerApi): Promise<PluginConfig> {
   }
 }
 
-export async function readSecret(orca: OrcaWorkerApi, key: 'githubToken' | 'jiraToken'): Promise<string | null> {
+export async function readSecret(
+  orca: OrcaWorkerApi,
+  key: 'githubToken' | 'jiraToken'
+): Promise<string | null> {
   try {
     const value = await orca.secrets.get(key)
     return value && value.trim() ? value.trim() : null

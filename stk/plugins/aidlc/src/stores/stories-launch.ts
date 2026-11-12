@@ -87,7 +87,9 @@ export async function launchStories(
   }
   const keys = Object.fromEntries(result.created.map((item) => [item.storyId, item.key]))
   const updated = writeJiraKeys(file.content, { stories: keys, epic: result.epic?.key ?? null })
-  const summary = [result.epic?.key, ...result.created.map((item) => item.key)].filter(Boolean).join(', ')
+  const summary = [result.epic?.key, ...result.created.map((item) => item.key)]
+    .filter(Boolean)
+    .join(', ')
   await source.writeFile(path, updated, {
     message: `aidlc: histórias lançadas no Jira (${summary}) por ${request.author}`,
     expectedVersion: file.version

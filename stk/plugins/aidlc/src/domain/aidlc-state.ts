@@ -2,7 +2,12 @@
 // `- [x] Requirements Analysis (COMPLETED)`) and v2 (`- [-] units-generation — EXECUTE`).
 import { plainText, splitLines } from './markdown-lines'
 
-export type AidlcPhaseId = 'initialization' | 'ideation' | 'inception' | 'construction' | 'operations'
+export type AidlcPhaseId =
+  | 'initialization'
+  | 'ideation'
+  | 'inception'
+  | 'construction'
+  | 'operations'
 
 export type AidlcStageStatus =
   | 'pending'
@@ -28,7 +33,8 @@ export type AidlcState = {
   projectType: string | null
 }
 
-const PHASE_HEADING = /^#{2,4}\s+(?:\S+\s+)?(INITIALIZATION|IDEATION|INCEPTION|CONSTRUCTION|OPERATIONS?)\s+PHASE\b/i
+const PHASE_HEADING =
+  /^#{2,4}\s+(?:\S+\s+)?(INITIALIZATION|IDEATION|INCEPTION|CONSTRUCTION|OPERATIONS?)\s+PHASE\b/i
 const STAGE = /^[-*]\s+\[(.)\]\s+(.+?)\s*$/
 const FIELD = /^[-*]\s+\*\*(.+?)\*\*:\s*(.*)$/
 
@@ -52,7 +58,9 @@ function parseStage(mark: string, rest: string): AidlcStage {
   let text = plainText(rest)
   let plan: string | null = null
   const v2 = /^(.+?)\s+[—–-]\s+([A-Z]+)\b.*$/.exec(text)
-  const v1Plan = /^(.+?)\s+-\s+\[?(EXECUTE|SKIP|PLACEHOLDER)(?:\/SKIP)?\]?(?:\s*\(.*\))?\s*$/.exec(text)
+  const v1Plan = /^(.+?)\s+-\s+\[?(EXECUTE|SKIP|PLACEHOLDER)(?:\/SKIP)?\]?(?:\s*\(.*\))?\s*$/.exec(
+    text
+  )
   if (v1Plan) {
     text = v1Plan[1]
     plan = v1Plan[2]
@@ -84,7 +92,7 @@ export function parseState(source: string): AidlcState {
   let inStageProgress = false
 
   for (const { text } of splitLines(source)) {
-    if (/^##\s+/.test(text) && !/^###/.test(text)) {
+    if (/^##\s+/.test(text) && !text.startsWith('###')) {
       inStageProgress = /^##\s+Stage Progress/i.test(text)
       current = null
     }

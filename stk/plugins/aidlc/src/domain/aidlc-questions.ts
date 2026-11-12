@@ -84,7 +84,10 @@ export const aidlcV2Format: AidlcQuestionsFormat = {
   }
 }
 
-export const AIDLC_QUESTIONS_FORMATS: readonly AidlcQuestionsFormat[] = [aidlcV2Format, aidlcV1Format]
+export const AIDLC_QUESTIONS_FORMATS: readonly AidlcQuestionsFormat[] = [
+  aidlcV2Format,
+  aidlcV1Format
+]
 
 export function detectQuestionsFormat(
   source: string,
@@ -119,7 +122,10 @@ function slug(text: string): string {
   )
 }
 
-export function interpretAnswer(raw: string | null, options: readonly AidlcOption[]): AidlcAnswer | null {
+export function interpretAnswer(
+  raw: string | null,
+  options: readonly AidlcOption[]
+): AidlcAnswer | null {
   if (raw === null) {
     return null
   }
@@ -186,7 +192,11 @@ function parseBlocks(lines: readonly SourceLine[]): { title: string | null; bloc
       }
       const option = OPTION.exec(text)
       if (option) {
-        options.push({ letter: option[1], text: plainText(option[2]), isOther: OTHER.test(plainText(option[2])) })
+        options.push({
+          letter: option[1],
+          text: plainText(option[2]),
+          isOther: OTHER.test(plainText(option[2]))
+        })
       } else if (options.length === 0 && text.trim() !== '') {
         promptLines.push(plainText(text))
       }
@@ -224,7 +234,10 @@ function parseBlocks(lines: readonly SourceLine[]): { title: string | null; bloc
   return { title, blocks }
 }
 
-export function parseQuestions(source: string, preferred?: AidlcQuestionsFormatId): AidlcQuestionsDocument {
+export function parseQuestions(
+  source: string,
+  preferred?: AidlcQuestionsFormatId
+): AidlcQuestionsDocument {
   const format = detectQuestionsFormat(source, preferred)
   const { title, blocks } = parseBlocks(splitLines(source))
   return { format: format.id, title, questions: blocks.map((block) => block.question) }
@@ -248,7 +261,8 @@ function validate(question: AidlcQuestion, answer: AidlcAnswer): void {
     throw new AidlcAnswerError(`${question.id} aceita uma única opção.`)
   }
   const other = question.options.find((option) => option.isOther)?.letter
-  const needsText = question.options.length === 0 || (other !== undefined && answer.letters.includes(other))
+  const needsText =
+    question.options.length === 0 || (other !== undefined && answer.letters.includes(other))
   if (needsText && !answer.otherText?.trim()) {
     throw new AidlcAnswerError(`${question.id}: descreva a resposta em texto livre.`)
   }
@@ -275,7 +289,9 @@ export function writeAnswer(
   }
   validate(block.question, answer)
   const value =
-    block.question.options.length === 0 ? (answer.otherText ?? '').trim() : format.formatAnswer(block.question, answer)
+    block.question.options.length === 0
+      ? (answer.otherText ?? '').trim()
+      : format.formatAnswer(block.question, answer)
   if (block.answerLine !== null) {
     const line = lines[block.answerLine]
     const prefix = ANSWER.exec(line.text)?.[1] ?? '[Answer]:'

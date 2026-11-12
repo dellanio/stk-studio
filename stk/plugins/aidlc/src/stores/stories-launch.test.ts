@@ -7,7 +7,10 @@ import { launchStories } from './stories-launch'
 
 const STORIES = 'inception/user-stories/stories.md'
 const record = { root: 'aidlc-docs', layout: 'aidlc-docs' as const, label: 'aidlc-docs' }
-const fixture = readFileSync(new URL(`../../fixtures/v1/aidlc-docs/${STORIES}`, import.meta.url), 'utf8')
+const fixture = readFileSync(
+  new URL(`../../fixtures/v1/aidlc-docs/${STORIES}`, import.meta.url),
+  'utf8'
+)
 
 test('launches the epic and the selected stories, writes keys back, never relaunches', async () => {
   const source = createMemoryFileSource('demo', { [`aidlc-docs/${STORIES}`]: fixture }, 'local')
@@ -15,7 +18,12 @@ test('launches the epic and the selected stories, writes keys back, never relaun
   const result = await launchStories(source, record, jira, {
     storiesFile: STORIES,
     stories: [
-      { id: 'US-001', summary: 'Enviar despesa', description: 'Editada pelo PO', acceptanceCriteria: ['AC editado'] },
+      {
+        id: 'US-001',
+        summary: 'Enviar despesa',
+        description: 'Editada pelo PO',
+        acceptanceCriteria: ['AC editado']
+      },
       { id: 'US-003', summary: 'Aprovar pedido', description: 'x', acceptanceCriteria: [] }
     ],
     newEpic: { summary: 'Reembolso', description: '' },
@@ -74,7 +82,9 @@ test('Cloud: ADF description with the criteria, epic as parent', () => {
   const fields = buildIssueFields(config, 'story', story)
   assert.deepEqual(fields.parent, { key: 'FIN-1' })
   assert.equal(fields.customfield_10008, undefined)
-  const description = fields.description as { content: { type: string; content?: { text?: string }[] }[] }
+  const description = fields.description as {
+    content: { type: string; content?: { text?: string }[] }[]
+  }
   assert.deepEqual(
     description.content.map((node) => [node.type, node.content?.[0]?.text ?? null]),
     [
@@ -86,7 +96,11 @@ test('Cloud: ADF description with the criteria, epic as parent', () => {
 })
 
 test('Data Center: wiki text, Epic Link field, criteria in their own field', () => {
-  const dc = { ...config, deployment: 'datacenter' as const, acceptanceCriteriaField: 'customfield_20000' }
+  const dc = {
+    ...config,
+    deployment: 'datacenter' as const,
+    acceptanceCriteriaField: 'customfield_20000'
+  }
   const fields = buildIssueFields(dc, 'story', story)
   assert.equal(fields.description, 'D')
   assert.equal(fields.customfield_20000, '* C1\n* C2')

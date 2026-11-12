@@ -13,9 +13,27 @@
   "main": "src/worker/worker.ts",
   "contributes": {
     "panels": [
-      { "id": "aidlc", "title": "AIDLC", "icon": "layers", "entry": "src/panels/dev-panel.tsx", "ui": "components" },
-      { "id": "inbox", "title": "Caixa de Entrada", "icon": "bell", "entry": "src/panels/inbox-panel.tsx", "ui": "components" },
-      { "id": "stories", "title": "Histórias → Jira", "icon": "book", "entry": "src/panels/stories-panel.tsx", "ui": "components" }
+      {
+        "id": "aidlc",
+        "title": "AIDLC",
+        "icon": "layers",
+        "entry": "src/panels/dev-panel.tsx",
+        "ui": "components"
+      },
+      {
+        "id": "inbox",
+        "title": "Caixa de Entrada",
+        "icon": "bell",
+        "entry": "src/panels/inbox-panel.tsx",
+        "ui": "components"
+      },
+      {
+        "id": "stories",
+        "title": "Histórias → Jira",
+        "icon": "book",
+        "entry": "src/panels/stories-panel.tsx",
+        "ui": "components"
+      }
     ],
     "commands": [{ "id": "inbox.refresh", "title": "AIDLC: verificar a Caixa de Entrada do PO" }],
     "statusBarItems": [
@@ -29,24 +47,136 @@
       }
     ],
     "settings": [
-      { "key": "userName", "title": "Seu nome", "description": "Aparece nas delegações e nas mensagens de commit. Vazio usa o user.name do git.", "type": "string", "default": "" },
-      { "key": "defaultPo", "title": "PO padrão", "description": "Para quem \"Enviar ao PO\" envia quando você não escolhe outra pessoa.", "type": "string", "default": "" },
-      { "key": "pushDelegations", "title": "Enviar ao PO faz commit e push", "description": "Desligado, o arquivo de delegações só é gravado e commitado localmente.", "type": "boolean", "default": true },
-      { "key": "aidlcFormat", "title": "Versão do formato AI-DLC", "description": "Automático detecta pelo conteúdo de cada arquivo de perguntas.", "type": "string", "enum": ["auto", "aidlc-v1", "aidlc-v2"], "enumLabels": ["Automático", "aidlc-workflows 0.x–1.x", "aidlc-workflows 2.x"], "default": "auto" },
-      { "key": "projects", "title": "Projetos do PO", "description": "Um por linha: owner/repo@branch. Lidos pela API do GitHub, sem clonar.", "type": "string", "multiline": true, "default": "", "placeholder": "minha-org/meu-repo@main" },
-      { "key": "githubApiUrl", "title": "URL da API do GitHub", "description": "Para GitHub Enterprise Server: https://<host>/api/v3", "type": "string", "default": "https://api.github.com" },
-      { "key": "pollMinutes", "title": "Verificar a Caixa de Entrada a cada (minutos)", "type": "integer", "default": 5, "minimum": 1, "maximum": 120 },
-      { "key": "demoMode", "title": "Modo demonstração", "description": "GitHub e Jira simulados com projetos de exemplo; nada sai da máquina.", "type": "boolean", "default": false },
-      { "key": "jiraBaseUrl", "title": "Jira: URL base", "type": "string", "default": "", "placeholder": "https://empresa.atlassian.net" },
-      { "key": "jiraDeployment", "title": "Jira: tipo de instalação", "type": "string", "enum": ["cloud", "datacenter"], "enumLabels": ["Jira Cloud", "Jira Data Center / Server"], "default": "cloud" },
-      { "key": "jiraProjectKey", "title": "Jira: chave do projeto", "type": "string", "default": "", "placeholder": "PROJ" },
-      { "key": "jiraEmail", "title": "Jira: e-mail da conta", "description": "Jira Cloud (token de API). Vazio usa o token como PAT (Data Center).", "type": "string", "default": "" },
-      { "key": "jiraEpicIssueType", "title": "Jira: tipo de issue do épico", "type": "string", "default": "Epic" },
-      { "key": "jiraStoryIssueType", "title": "Jira: tipo de issue da história", "type": "string", "default": "Story" },
-      { "key": "jiraAcceptanceCriteriaField", "title": "Jira: campo dos critérios de aceite", "description": "Id do campo (ex.: customfield_10100). Vazio coloca os critérios na descrição.", "type": "string", "default": "" },
-      { "key": "jiraEpicLinkField", "title": "Jira Data Center: campo Epic Link", "description": "Ex.: customfield_10008. No Jira Cloud o épico vai como pai (parent).", "type": "string", "default": "" },
-      { "key": "jiraEpicNameField", "title": "Jira Data Center: campo Epic Name", "description": "Ex.: customfield_10011, obrigatório para criar épicos no Data Center.", "type": "string", "default": "" },
-      { "key": "jiraLabels", "title": "Jira: rótulos", "description": "Separados por vírgula.", "type": "string", "default": "aidlc" }
+      {
+        "key": "userName",
+        "title": "Seu nome",
+        "description": "Aparece nas delegações e nas mensagens de commit. Vazio usa o user.name do git.",
+        "type": "string",
+        "default": ""
+      },
+      {
+        "key": "defaultPo",
+        "title": "PO padrão",
+        "description": "Para quem \"Enviar ao PO\" envia quando você não escolhe outra pessoa.",
+        "type": "string",
+        "default": ""
+      },
+      {
+        "key": "pushDelegations",
+        "title": "Enviar ao PO faz commit e push",
+        "description": "Desligado, o arquivo de delegações só é gravado e commitado localmente.",
+        "type": "boolean",
+        "default": true
+      },
+      {
+        "key": "aidlcFormat",
+        "title": "Versão do formato AI-DLC",
+        "description": "Automático detecta pelo conteúdo de cada arquivo de perguntas.",
+        "type": "string",
+        "enum": ["auto", "aidlc-v1", "aidlc-v2"],
+        "enumLabels": ["Automático", "aidlc-workflows 0.x–1.x", "aidlc-workflows 2.x"],
+        "default": "auto"
+      },
+      {
+        "key": "projects",
+        "title": "Projetos do PO",
+        "description": "Um por linha: owner/repo@branch. Lidos pela API do GitHub, sem clonar.",
+        "type": "string",
+        "multiline": true,
+        "default": "",
+        "placeholder": "minha-org/meu-repo@main"
+      },
+      {
+        "key": "githubApiUrl",
+        "title": "URL da API do GitHub",
+        "description": "Para GitHub Enterprise Server: https://<host>/api/v3",
+        "type": "string",
+        "default": "https://api.github.com"
+      },
+      {
+        "key": "pollMinutes",
+        "title": "Verificar a Caixa de Entrada a cada (minutos)",
+        "type": "integer",
+        "default": 5,
+        "minimum": 1,
+        "maximum": 120
+      },
+      {
+        "key": "demoMode",
+        "title": "Modo demonstração",
+        "description": "GitHub e Jira simulados com projetos de exemplo; nada sai da máquina.",
+        "type": "boolean",
+        "default": false
+      },
+      {
+        "key": "jiraBaseUrl",
+        "title": "Jira: URL base",
+        "type": "string",
+        "default": "",
+        "placeholder": "https://empresa.atlassian.net"
+      },
+      {
+        "key": "jiraDeployment",
+        "title": "Jira: tipo de instalação",
+        "type": "string",
+        "enum": ["cloud", "datacenter"],
+        "enumLabels": ["Jira Cloud", "Jira Data Center / Server"],
+        "default": "cloud"
+      },
+      {
+        "key": "jiraProjectKey",
+        "title": "Jira: chave do projeto",
+        "type": "string",
+        "default": "",
+        "placeholder": "PROJ"
+      },
+      {
+        "key": "jiraEmail",
+        "title": "Jira: e-mail da conta",
+        "description": "Jira Cloud (token de API). Vazio usa o token como PAT (Data Center).",
+        "type": "string",
+        "default": ""
+      },
+      {
+        "key": "jiraEpicIssueType",
+        "title": "Jira: tipo de issue do épico",
+        "type": "string",
+        "default": "Epic"
+      },
+      {
+        "key": "jiraStoryIssueType",
+        "title": "Jira: tipo de issue da história",
+        "type": "string",
+        "default": "Story"
+      },
+      {
+        "key": "jiraAcceptanceCriteriaField",
+        "title": "Jira: campo dos critérios de aceite",
+        "description": "Id do campo (ex.: customfield_10100). Vazio coloca os critérios na descrição.",
+        "type": "string",
+        "default": ""
+      },
+      {
+        "key": "jiraEpicLinkField",
+        "title": "Jira Data Center: campo Epic Link",
+        "description": "Ex.: customfield_10008. No Jira Cloud o épico vai como pai (parent).",
+        "type": "string",
+        "default": ""
+      },
+      {
+        "key": "jiraEpicNameField",
+        "title": "Jira Data Center: campo Epic Name",
+        "description": "Ex.: customfield_10011, obrigatório para criar épicos no Data Center.",
+        "type": "string",
+        "default": ""
+      },
+      {
+        "key": "jiraLabels",
+        "title": "Jira: rótulos",
+        "description": "Separados por vírgula.",
+        "type": "string",
+        "default": "aidlc"
+      }
     ]
   },
   "capabilities": [

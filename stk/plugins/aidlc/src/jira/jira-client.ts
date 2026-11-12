@@ -70,7 +70,8 @@ export function buildIssueFields(
 ): Record<string, unknown> {
   const cloud = config.deployment === 'cloud'
   const criteria = input.acceptanceCriteria.filter((item) => item.trim() !== '')
-  const inField = kind === 'story' && config.acceptanceCriteriaField.trim() !== '' && criteria.length > 0
+  const inField =
+    kind === 'story' && config.acceptanceCriteriaField.trim() !== '' && criteria.length > 0
   const descriptionBullets = kind === 'story' && !inField ? criteria : []
   const heading = descriptionBullets.length > 0 ? '\n\nCritérios de aceite:' : ''
   const fields: Record<string, unknown> = {
@@ -111,7 +112,10 @@ async function errorText(response: { text(): Promise<string> }): Promise<string>
   const body = await response.text()
   try {
     const parsed = JSON.parse(body) as { errorMessages?: string[]; errors?: Record<string, string> }
-    const parts = [...(parsed.errorMessages ?? []), ...Object.entries(parsed.errors ?? {}).map(([key, value]) => `${key}: ${value}`)]
+    const parts = [
+      ...(parsed.errorMessages ?? []),
+      ...Object.entries(parsed.errors ?? {}).map(([key, value]) => `${key}: ${value}`)
+    ]
     return parts.join('; ') || body.slice(0, 300)
   } catch {
     return body.slice(0, 300)
@@ -134,7 +138,9 @@ export function createRestJiraClient(config: JiraConfig, fetchImpl?: HttpFetch):
       body: JSON.stringify({ fields: buildIssueFields(config, kind, input) })
     })
     if (response.status === 401 || response.status === 403) {
-      throw new JiraApiError('Jira recusou as credenciais. Confira o token e o e-mail nas configurações.')
+      throw new JiraApiError(
+        'Jira recusou as credenciais. Confira o token e o e-mail nas configurações.'
+      )
     }
     if (!response.ok) {
       throw new JiraApiError(`Jira recusou (${response.status}): ${await errorText(response)}`)
@@ -164,7 +170,8 @@ export function createFakeJiraClient(projectKey = 'DEMO', firstNumber = 1): Fake
   }
   return {
     issues,
-    createEpic: async (input) => create('epic', { ...input, acceptanceCriteria: [], epicKey: null }),
+    createEpic: async (input) =>
+      create('epic', { ...input, acceptanceCriteria: [], epicKey: null }),
     createStory: async (input) => create('story', input)
   }
 }

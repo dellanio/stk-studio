@@ -1,6 +1,10 @@
 // A repository read and written through the GitHub REST API (contents + trees), so the PO never
 // clones. Each write is one commit authored by the token's owner.
-import { SourceConflictError, type RecordFileSource, type VersionedFile } from './record-file-source'
+import {
+  SourceConflictError,
+  type RecordFileSource,
+  type VersionedFile
+} from './record-file-source'
 
 export type GitHubProject = { owner: string; repo: string; branch: string }
 
@@ -82,11 +86,17 @@ export function createGitHubFileSource(options: GitHubSourceOptions): RecordFile
   }
 
   async function loadTree(): Promise<string[] | null> {
-    const response = await call('GET', `${repoUrl}/git/trees/${encodeURIComponent(project.branch)}?recursive=1`)
+    const response = await call(
+      'GET',
+      `${repoUrl}/git/trees/${encodeURIComponent(project.branch)}?recursive=1`
+    )
     if (!response.ok) {
       throw new GitHubApiError(describe(response.status, project), response.status)
     }
-    const data = (await response.json()) as { truncated?: boolean; tree?: { path: string; type: string }[] }
+    const data = (await response.json()) as {
+      truncated?: boolean
+      tree?: { path: string; type: string }[]
+    }
     if (data.truncated) {
       return null
     }
@@ -94,7 +104,10 @@ export function createGitHubFileSource(options: GitHubSourceOptions): RecordFile
   }
 
   async function walkContents(dir: string, into: string[]): Promise<void> {
-    const response = await call('GET', `${repoUrl}/contents/${encodePath(dir)}?ref=${encodeURIComponent(project.branch)}`)
+    const response = await call(
+      'GET',
+      `${repoUrl}/contents/${encodePath(dir)}?ref=${encodeURIComponent(project.branch)}`
+    )
     if (response.status === 404) {
       return
     }
@@ -125,7 +138,10 @@ export function createGitHubFileSource(options: GitHubSourceOptions): RecordFile
       return files.sort()
     },
     async readFile(path): Promise<VersionedFile | null> {
-      const response = await call('GET', `${repoUrl}/contents/${encodePath(path)}?ref=${encodeURIComponent(project.branch)}`)
+      const response = await call(
+        'GET',
+        `${repoUrl}/contents/${encodePath(path)}?ref=${encodeURIComponent(project.branch)}`
+      )
       if (response.status === 404) {
         return null
       }

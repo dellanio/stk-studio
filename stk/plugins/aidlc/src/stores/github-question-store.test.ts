@@ -4,15 +4,22 @@ import { parseQuestions } from '../domain/aidlc-questions'
 import { parseLedger } from '../domain/delegations'
 import { startFakeGitHub } from '../sources/github-fake-server'
 import { createGitHubFileSource } from '../sources/github-file-source'
-import { answerQuestion, discoverRecords, loadRecordSnapshot, resolveDelegations } from './aidlc-record-store'
+import {
+  answerQuestion,
+  discoverRecords,
+  loadRecordSnapshot,
+  resolveDelegations
+} from './aidlc-record-store'
 
 const ROOT = 'aidlc/spaces/default/intents/261104-reembolso'
 const QUESTIONS = 'inception/requirements-analysis/requirements-analysis-questions.md'
 const seed = Object.fromEntries(
-  ['aidlc-state.md', QUESTIONS, 'inception/user-stories/stories.md', '.stk/delegations.json'].map((path) => [
-    `${ROOT}/${path}`,
-    readFileSync(new URL(`../../fixtures/v2/${ROOT}/${path}`, import.meta.url), 'utf8')
-  ])
+  ['aidlc-state.md', QUESTIONS, 'inception/user-stories/stories.md', '.stk/delegations.json'].map(
+    (path) => [
+      `${ROOT}/${path}`,
+      readFileSync(new URL(`../../fixtures/v2/${ROOT}/${path}`, import.meta.url), 'utf8')
+    ]
+  )
 )
 const project = { owner: 'acme', repo: 'reembolso', branch: 'aidlc' }
 
@@ -25,7 +32,9 @@ test('PO answers through the GitHub API: answer commit, then the delegation clos
 
     const snapshot = await loadRecordSnapshot(source, record)
     assert.deepEqual(
-      snapshot.delegations.filter((item) => item.status === 'pending').map((item) => item.questionId),
+      snapshot.delegations
+        .filter((item) => item.status === 'pending')
+        .map((item) => item.questionId),
       ['Q2', 'Q3']
     )
 
@@ -35,7 +44,15 @@ test('PO answers through the GitHub API: answer commit, then the delegation clos
       answer: { letters: ['B'] },
       author: 'PO Demo'
     })
-    assert.equal(await resolveDelegations(source, record, { questionsFile: QUESTIONS, questionId: 'Q2' }, 'PO Demo'), true)
+    assert.equal(
+      await resolveDelegations(
+        source,
+        record,
+        { questionsFile: QUESTIONS, questionId: 'Q2' },
+        'PO Demo'
+      ),
+      true
+    )
 
     const answered = parseQuestions(github.files.get(`${ROOT}/${QUESTIONS}`)?.content ?? '')
     assert.equal(answered.questions[1].rawAnswer, 'B. Gestor direto e depois o financeiro')
@@ -71,7 +88,12 @@ test('a change made in the repository after the read is a conflict, not an overw
       return file
     }
     await assert.rejects(
-      answerQuestion(source, record, { questionsFile: QUESTIONS, questionId: 'Q2', answer: { letters: ['A'] }, author: 'PO' }),
+      answerQuestion(source, record, {
+        questionsFile: QUESTIONS,
+        questionId: 'Q2',
+        answer: { letters: ['A'] },
+        author: 'PO'
+      }),
       /mudou desde a última leitura/
     )
     assert.equal(github.commits.length, 0)

@@ -48,7 +48,10 @@ test('v1: writing an answer changes only that [Answer]: line and reads back', ()
   assert.deepEqual(changedLines(before, after), ['[Answer]: B'])
   assert.deepEqual(parseQuestions(after).questions[1].answer, { letters: ['B'] })
 
-  const other = writeAnswer(after, 'Q4', { letters: ['X'], otherText: 'Até o dia 15 do mês seguinte' })
+  const other = writeAnswer(after, 'Q4', {
+    letters: ['X'],
+    otherText: 'Até o dia 15 do mês seguinte'
+  })
   assert.deepEqual(changedLines(after, other), ['[Answer]: X) Até o dia 15 do mês seguinte'])
   assert.deepEqual(parseQuestions(other).questions[3].answer, {
     letters: ['X'],
@@ -67,20 +70,28 @@ test('v2: reads trades and labelled answers, writes letter + label', () => {
   assert.equal(doc.questions[3].trade, 'Developer')
 
   const single = writeAnswer(before, 'Q2', { letters: ['B'] })
-  assert.deepEqual(changedLines(before, single), ['[Answer]: B. Gestor direto e depois o financeiro'])
+  assert.deepEqual(changedLines(before, single), [
+    '[Answer]: B. Gestor direto e depois o financeiro'
+  ])
 
   const multi = writeAnswer(single, 'Q3', { letters: ['A', 'C'] })
   assert.deepEqual(changedLines(single, multi), ['[Answer]: A, C'])
   assert.deepEqual(parseQuestions(multi).questions[2].answer, { letters: ['A', 'C'] })
 
-  const other = writeAnswer(multi, 'Q4', { letters: ['X'], otherText: 'Bucket do time de finanças' })
+  const other = writeAnswer(multi, 'Q4', {
+    letters: ['X'],
+    otherText: 'Bucket do time de finanças'
+  })
   assert.deepEqual(changedLines(multi, other), ['[Answer]: X. Bucket do time de finanças'])
 })
 
 test('keeps CRLF endings and every other byte', () => {
   const crlf = fixture(V2).replace(/\n/g, '\r\n')
   const after = writeAnswer(crlf, 'Q2', { letters: ['C'] })
-  const expected = crlf.replace(/(## Q2\.[\s\S]*?)\[Answer\]:\r\n/, '$1[Answer]: C. Só o financeiro\r\n')
+  const expected = crlf.replace(
+    /(## Q2\.[\s\S]*?)\[Answer\]:\r\n/,
+    '$1[Answer]: C. Só o financeiro\r\n'
+  )
   assert.notEqual(expected, crlf)
   assert.equal(after, expected)
 })

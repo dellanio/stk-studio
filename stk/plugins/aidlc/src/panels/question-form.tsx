@@ -15,8 +15,11 @@ export function draftFromQuestion(question: AidlcQuestion): AnswerDraft {
 
 export function answerFromDraft(question: AidlcQuestion, draft: AnswerDraft): AidlcAnswer {
   const other = question.options.find((option) => option.isOther)?.letter
-  const needsText = question.options.length === 0 || (other !== undefined && draft.letters.includes(other))
-  return needsText && draft.other.trim() ? { letters: draft.letters, otherText: draft.other.trim() } : { letters: draft.letters }
+  const needsText =
+    question.options.length === 0 || (other !== undefined && draft.letters.includes(other))
+  return needsText && draft.other.trim()
+    ? { letters: draft.letters, otherText: draft.other.trim() }
+    : { letters: draft.letters }
 }
 
 export function canSave(question: AidlcQuestion, draft: AnswerDraft): boolean {
@@ -40,12 +43,15 @@ export function QuestionForm(props: {
 }) {
   const { question, draft, busy } = props
   const other = question.options.find((option) => option.isOther)?.letter
-  const showText = question.options.length === 0 || (other !== undefined && draft.letters.includes(other))
+  const showText =
+    question.options.length === 0 || (other !== undefined && draft.letters.includes(other))
   const optionLabel = (letter: string, text: string): string =>
     letter === other ? `${letter}. Outra resposta (especifique)` : `${letter}. ${text}`
   return (
     <Stack gap="sm">
-      {question.prompt && question.prompt !== question.title ? <Text muted>{question.prompt}</Text> : null}
+      {question.prompt && question.prompt !== question.title ? (
+        <Text muted>{question.prompt}</Text>
+      ) : null}
       {question.trade ? (
         <Row gap="xs">
           <Badge tone="neutral">{`Para: ${question.trade}`}</Badge>
@@ -79,7 +85,10 @@ export function QuestionForm(props: {
           labelHidden
           value={draft.letters[0] ?? ''}
           disabled={busy}
-          options={question.options.map((option) => ({ value: option.letter, label: optionLabel(option.letter, option.text) }))}
+          options={question.options.map((option) => ({
+            value: option.letter,
+            label: optionLabel(option.letter, option.text)
+          }))}
           onChange={(value) => props.onDraft({ ...draft, letters: [value] })}
         />
       ) : null}

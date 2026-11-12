@@ -34,13 +34,16 @@ export async function collectInbox(
       try {
         for (const record of await discoverRecords(source)) {
           const snapshot = await loadRecordSnapshot(source, record, format)
-          collection.errors.push(...snapshot.errors.map((error) => `${source.label}: ${error.path}: ${error.message}`))
+          collection.errors.push(
+            ...snapshot.errors.map((error) => `${source.label}: ${error.path}: ${error.message}`)
+          )
           status.records.push({
             label: record.label,
             root: record.root,
             phases: phaseViews(snapshot.state),
             pendingQuestions: snapshot.questionFiles.reduce(
-              (count, file) => count + file.questions.filter((question) => question.rawAnswer === null).length,
+              (count, file) =>
+                count + file.questions.filter((question) => question.rawAnswer === null).length,
               0
             )
           })
@@ -48,7 +51,9 @@ export async function collectInbox(
             if (delegation.status !== 'pending') {
               continue
             }
-            const file = snapshot.questionFiles.find((candidate) => candidate.path === delegation.questionsFile)
+            const file = snapshot.questionFiles.find(
+              (candidate) => candidate.path === delegation.questionsFile
+            )
             collection.items.push({
               key: `${source.label}|${record.root}|${delegation.id}`,
               projectLabel: source.label,
@@ -57,7 +62,8 @@ export async function collectInbox(
               delegation,
               phaseLabel: phaseLabel(delegation.phase ?? file?.phase ?? null),
               stageLabel: stageLabel(delegation.stage ?? file?.stage ?? null),
-              question: file?.questions.find((question) => question.id === delegation.questionId) ?? null
+              question:
+                file?.questions.find((question) => question.id === delegation.questionId) ?? null
             })
           }
         }
@@ -80,7 +86,10 @@ export async function answerInboxItem(
   format?: AidlcQuestionsFormatId
 ): Promise<void> {
   const record = { root: item.recordRoot, layout: 'aidlc-docs' as const, label: item.recordLabel }
-  const question = { questionsFile: item.delegation.questionsFile, questionId: item.delegation.questionId }
+  const question = {
+    questionsFile: item.delegation.questionsFile,
+    questionId: item.delegation.questionId
+  }
   await answerQuestion(source, record, { ...question, answer, author }, format)
   await resolveDelegations(source, record, question, author)
 }

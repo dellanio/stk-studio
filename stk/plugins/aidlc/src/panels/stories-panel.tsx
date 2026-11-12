@@ -69,10 +69,17 @@ async function loadStories(value: string): Promise<void> {
   set(failure, null)
   set(outcome, null)
   try {
-    const result = await plugin.request('stories.load', { sourceId, storiesFile }, { timeoutMs: 120_000 })
+    const result = await plugin.request(
+      'stories.load',
+      { sourceId, storiesFile },
+      { timeoutMs: 120_000 }
+    )
     set(view, result)
     set(edits, {})
-    set(selected, result.stories.filter((story) => !story.jiraKey).map((story) => story.id))
+    set(
+      selected,
+      result.stories.filter((story) => !story.jiraKey).map((story) => story.id)
+    )
     const epicName = result.stories.find((story) => story.epic)?.epic
     set(epicTitle, epicName ?? '')
     set(createEpic, !result.epicJiraKey)
@@ -90,7 +97,9 @@ async function loadSources(): Promise<void> {
     const result = await plugin.request('stories.sources', {}, { timeoutMs: 120_000 })
     set(sources, result.sources)
     set(notice, result.notice)
-    const options = result.sources.flatMap((source) => source.storiesFiles.map((file) => `${source.id}${SEP}${file}`))
+    const options = result.sources.flatMap((source) =>
+      source.storiesFiles.map((file) => `${source.id}${SEP}${file}`)
+    )
     const keep = options.includes(read(choice)) ? read(choice) : options[0]
     if (keep) {
       await loadStories(keep)
@@ -107,7 +116,9 @@ async function launch(): Promise<void> {
   if (!current) {
     return
   }
-  const chosen = current.stories.filter((story) => read(selected).includes(story.id) && !story.jiraKey)
+  const chosen = current.stories.filter(
+    (story) => read(selected).includes(story.id) && !story.jiraKey
+  )
   set(busy, true)
   set(failure, null)
   set(confirming, false)
@@ -123,10 +134,16 @@ async function launch(): Promise<void> {
             id: story.id,
             summary: edit.summary.trim() || story.title,
             description: edit.description,
-            acceptanceCriteria: edit.criteria.split('\n').map((line) => line.trim()).filter(Boolean)
+            acceptanceCriteria: edit.criteria
+              .split('\n')
+              .map((line) => line.trim())
+              .filter(Boolean)
           }
         }),
-        newEpic: read(createEpic) && read(epicTitle).trim() ? { summary: read(epicTitle).trim(), description: '' } : null
+        newEpic:
+          read(createEpic) && read(epicTitle).trim()
+            ? { summary: read(epicTitle).trim(), description: '' }
+            : null
       },
       { timeoutMs: 120_000 }
     )
@@ -147,10 +164,14 @@ export function setup(_ctx: PanelContext): void {
 
 function StoryCard({ story }: { story: AidlcStory }) {
   const edit = editOf(story)
-  const change = (patch: Partial<StoryEdit>): void => update(edits, (all) => ({ ...all, [story.id]: { ...edit, ...patch } }))
+  const change = (patch: Partial<StoryEdit>): void =>
+    update(edits, (all) => ({ ...all, [story.id]: { ...edit, ...patch } }))
   const isSelected = read(selected).includes(story.id)
   return (
-    <Card title={`${story.id} · ${edit.summary}`} description={[story.epic, story.priority].filter(Boolean).join(' · ')}>
+    <Card
+      title={`${story.id} · ${edit.summary}`}
+      description={[story.epic, story.priority].filter(Boolean).join(' · ')}
+    >
       <Stack gap="sm">
         <Row justify="between">
           {story.jiraKey ? (
@@ -161,7 +182,9 @@ function StoryCard({ story }: { story: AidlcStory }) {
               checked={isSelected}
               disabled={read(busy)}
               onChange={(checked) =>
-                update(selected, (ids) => (checked ? [...ids, story.id] : ids.filter((id) => id !== story.id)))
+                update(selected, (ids) =>
+                  checked ? [...ids, story.id] : ids.filter((id) => id !== story.id)
+                )
               }
             />
           )}
@@ -184,8 +207,17 @@ function StoryCard({ story }: { story: AidlcStory }) {
         {story.jiraKey ? null : (
           <Collapsible title="Editar antes de lançar">
             <Stack gap="sm">
-              <Input label="Título" value={edit.summary} onChange={(value) => change({ summary: value })} />
-              <Textarea label="Descrição" rows={3} value={edit.description} onChange={(value) => change({ description: value })} />
+              <Input
+                label="Título"
+                value={edit.summary}
+                onChange={(value) => change({ summary: value })}
+              />
+              <Textarea
+                label="Descrição"
+                rows={3}
+                value={edit.description}
+                onChange={(value) => change({ description: value })}
+              />
               <Textarea
                 label="Critérios de aceite (um por linha)"
                 rows={4}
@@ -201,7 +233,10 @@ function StoryCard({ story }: { story: AidlcStory }) {
 }
 
 function Outcome({ result }: { result: LaunchResult }) {
-  const keys = [result.epic ? `épico ${result.epic.key}` : null, ...result.created.map((item) => `${item.storyId} → ${item.key}`)]
+  const keys = [
+    result.epic ? `épico ${result.epic.key}` : null,
+    ...result.created.map((item) => `${item.storyId} → ${item.key}`)
+  ]
     .filter(Boolean)
     .join(', ')
   return (
@@ -223,15 +258,25 @@ function Outcome({ result }: { result: LaunchResult }) {
 export default function StoriesPanel() {
   const current = read(view)
   const options = read(sources).flatMap((source) =>
-    source.storiesFiles.map((file) => ({ value: `${source.id}${SEP}${file}`, label: `${source.label} · ${file.split('/').slice(-2).join('/')}` }))
+    source.storiesFiles.map((file) => ({
+      value: `${source.id}${SEP}${file}`,
+      label: `${source.label} · ${file.split('/').slice(-2).join('/')}`
+    }))
   )
-  const toLaunch = current ? current.stories.filter((story) => read(selected).includes(story.id) && !story.jiraKey).length : 0
+  const toLaunch = current
+    ? current.stories.filter((story) => read(selected).includes(story.id) && !story.jiraKey).length
+    : 0
   const result = read(outcome)
   return (
     <Stack gap="md">
       <Row justify="between">
         <Heading>Histórias → Jira</Heading>
-        <IconButton icon="refresh" label="Atualizar" disabled={read(loading)} onPress={() => void loadSources()} />
+        <IconButton
+          icon="refresh"
+          label="Atualizar"
+          disabled={read(loading)}
+          onPress={() => void loadSources()}
+        />
       </Row>
       {read(failure) ? (
         <Callout tone="danger" title="Não foi possível concluir">
@@ -240,10 +285,19 @@ export default function StoriesPanel() {
       ) : null}
       {read(loading) && !current ? <Spinner label="Procurando histórias" /> : null}
       {options.length === 0 && !read(loading) ? (
-        <EmptyState icon="book" title="Nenhuma história encontrada" description={read(notice) ?? undefined} />
+        <EmptyState
+          icon="book"
+          title="Nenhuma história encontrada"
+          description={read(notice) ?? undefined}
+        />
       ) : null}
       {options.length > 0 ? (
-        <Select label="Histórias de" value={read(choice)} options={options} onChange={(value) => void loadStories(value)} />
+        <Select
+          label="Histórias de"
+          value={read(choice)}
+          options={options}
+          onChange={(value) => void loadStories(value)}
+        />
       ) : null}
       {result ? <Outcome result={result} /> : null}
       {current ? (
@@ -259,12 +313,24 @@ export default function StoriesPanel() {
               </Stack>
             ) : (
               <Stack gap="sm">
-                <Checkbox label="Criar um épico para estas histórias" checked={read(createEpic)} onChange={(checked) => set(createEpic, checked)} />
-                {read(createEpic) ? <Input label="Título do épico" value={read(epicTitle)} onChange={(value) => set(epicTitle, value)} /> : null}
+                <Checkbox
+                  label="Criar um épico para estas histórias"
+                  checked={read(createEpic)}
+                  onChange={(checked) => set(createEpic, checked)}
+                />
+                {read(createEpic) ? (
+                  <Input
+                    label="Título do épico"
+                    value={read(epicTitle)}
+                    onChange={(value) => set(epicTitle, value)}
+                  />
+                ) : null}
               </Stack>
             )}
           </Card>
-          {current.stories.length === 0 ? <EmptyState icon="book" title="O arquivo não tem histórias reconhecidas" /> : null}
+          {current.stories.length === 0 ? (
+            <EmptyState icon="book" title="O arquivo não tem histórias reconhecidas" />
+          ) : null}
           {current.stories.map((story) => (
             <StoryCard key={story.id} story={story} />
           ))}
@@ -284,7 +350,11 @@ export default function StoriesPanel() {
             </Callout>
           ) : (
             <Row justify="end">
-              <Button icon="rocket" disabled={read(busy) || toLaunch === 0} onPress={() => set(confirming, true)}>
+              <Button
+                icon="rocket"
+                disabled={read(busy) || toLaunch === 0}
+                onPress={() => set(confirming, true)}
+              >
                 {`Lançar no Jira (${toLaunch})`}
               </Button>
             </Row>

@@ -1,12 +1,19 @@
 // The developer's checkout on this machine (P11: local only).
 import { mkdir, readdir, readFile, writeFile } from 'node:fs/promises'
 import { dirname, join } from 'node:path'
-import { contentVersion, SourceConflictError, type RecordFileSource, type VersionedFile } from './record-file-source'
+import {
+  contentVersion,
+  SourceConflictError,
+  type RecordFileSource,
+  type VersionedFile
+} from './record-file-source'
 
 const SKIPPED = new Set(['node_modules', '.git'])
 
 function isMissing(error: unknown): boolean {
-  return typeof error === 'object' && error !== null && (error as { code?: unknown }).code === 'ENOENT'
+  return (
+    typeof error === 'object' && error !== null && (error as { code?: unknown }).code === 'ENOENT'
+  )
 }
 
 export function createLocalFileSource(rootDir: string, label: string): RecordFileSource {

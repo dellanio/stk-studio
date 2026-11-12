@@ -64,5 +64,8 @@ declare module 'node:http' {
 
 declare const process: { env: Record<string, string | undefined>; platform: string }
 declare const Buffer: {
-  from(value: string, encoding?: 'utf8' | 'base64'): { toString(encoding: 'utf8' | 'base64'): string }
+  from(
+    value: string,
+    encoding?: 'utf8' | 'base64'
+  ): { toString(encoding: 'utf8' | 'base64'): string }
 }

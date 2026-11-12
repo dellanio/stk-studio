@@ -22,10 +22,12 @@ export type AidlcStoriesDocument = {
 }
 
 const HEADING = /^(#{1,5})\s+(.*?)\s*$/
-const STORY_ID = /\b(US[-\s]?\d+(?:\.\d+)*|STORY[-\s]\d+(?:\.\d+)*|Story\s+\d+(?:\.\d+)*|História\s+\d+(?:\.\d+)*)\b/i
+const STORY_ID =
+  /\b(US[-\s]?\d+(?:\.\d+)*|STORY[-\s]\d+(?:\.\d+)*|Story\s+\d+(?:\.\d+)*|História\s+\d+(?:\.\d+)*)\b/i
 const EPIC = /^(?:Epic|Épico)\b[\s\d.:\-—–]*(.*)$/i
 const JIRA_LINE = /^\s*(?:[-*]\s+)?\**Jira\**\s*:\**\s*([A-Z][A-Z0-9_]+-\d+)\b/
-const EPIC_JIRA_LINE = /^\s*(?:[-*]\s+)?\**Jira[- ](?:Epic|épico)\**\s*:\**\s*([A-Z][A-Z0-9_]+-\d+)\b/i
+const EPIC_JIRA_LINE =
+  /^\s*(?:[-*]\s+)?\**Jira[- ](?:Epic|épico)\**\s*:\**\s*([A-Z][A-Z0-9_]+-\d+)\b/i
 const CRITERIA_HEADING = /acceptance criteria|crit[ée]rios de aceit/i
 const PRIORITY = /^\s*(?:[-*]\s+)?\**(?:Priority|Prioridade)\**\s*:\**\s*(.+)$/i
 const LIST_ITEM = /^\s*(?:[-*+]|\d+[.)])\s+(?:\[[ xX]\]\s+)?(.+)$/
@@ -34,7 +36,10 @@ const FIELD_LINE = /^\s*(?:[-*]\s+)?\*\*[^*]+\*\*\s*:/
 type StoryBlock = { story: AidlcStory; headingLine: number; jiraLine: number | null }
 
 function storyTitle(heading: string, id: string): string {
-  const rest = heading.replace(id, '').replace(/^[\s:.\-—–]+/, '').trim()
+  const rest = heading
+    .replace(id, '')
+    .replace(/^[\s:.\-—–]+/, '')
+    .trim()
   return plainText(rest) || id
 }
 
@@ -55,7 +60,11 @@ function parseBlocks(lines: readonly SourceLine[]): {
   const finish = (): void => {
     if (current) {
       current.story.description = current.prose.join('\n').trim()
-      blocks.push({ story: current.story, headingLine: current.headingLine, jiraLine: current.jiraLine })
+      blocks.push({
+        story: current.story,
+        headingLine: current.headingLine,
+        jiraLine: current.jiraLine
+      })
       current = null
     }
   }
@@ -134,7 +143,10 @@ function parseBlocks(lines: readonly SourceLine[]): {
         current.story.acceptanceCriteria.push(plainText(item[1]))
         return
       }
-      if (/^\s*(Given|When|Then|And|Dado|Quando|Então|E)\b/i.test(text) && current.story.acceptanceCriteria.length > 0) {
+      if (
+        /^\s*(Given|When|Then|And|Dado|Quando|Então|E)\b/i.test(text) &&
+        current.story.acceptanceCriteria.length > 0
+      ) {
         const last = current.story.acceptanceCriteria.length - 1
         current.story.acceptanceCriteria[last] += ` ${plainText(text)}`
         return
@@ -156,7 +168,12 @@ function parseBlocks(lines: readonly SourceLine[]): {
     }
   })
   finish()
-  return { document: { title, epicJiraKey, stories: blocks.map((block) => block.story) }, blocks, titleLine, epicJiraLine }
+  return {
+    document: { title, epicJiraKey, stories: blocks.map((block) => block.story) },
+    blocks,
+    titleLine,
+    epicJiraLine
+  }
 }
 
 export function parseStories(source: string): AidlcStoriesDocument {

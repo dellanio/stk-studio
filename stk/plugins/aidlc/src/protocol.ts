@@ -87,12 +87,24 @@ declare module 'orca' {
       output: DevLoadResult
     }
     'dev.delegate': {
-      input: { recordRoot: string; questionsFile: string; questionId: string; assignedTo: string; note: string }
+      input: {
+        recordRoot: string
+        questionsFile: string
+        questionId: string
+        assignedTo: string
+        note: string
+      }
       output: { result: DevLoadResult; git: GitSyncResult }
     }
-    'dev.notifyAgent': { input: { recordRoot: string; questionsFile: string }; output: { message: string } }
+    'dev.notifyAgent': {
+      input: { recordRoot: string; questionsFile: string }
+      output: { message: string }
+    }
     'dev.openFile': { input: { recordRoot: string; path: string }; output: { opened: boolean } }
-    'dev.pull': { input: { recordRoot?: string }; output: { result: DevLoadResult; message: string } }
+    'dev.pull': {
+      input: { recordRoot?: string }
+      output: { result: DevLoadResult; message: string }
+    }
     'inbox.load': { input: { refresh: boolean }; output: InboxResult }
     'inbox.answer': {
       input: { itemKey: string; answer: AidlcAnswer }
@@ -103,7 +115,10 @@ declare module 'orca' {
       input: { key: 'githubToken' | 'jiraToken'; value: string }
       output: ConfigStatus
     }
-    'stories.sources': { input: Record<string, never>; output: { sources: StoriesSource[]; notice: string | null } }
+    'stories.sources': {
+      input: Record<string, never>
+      output: { sources: StoriesSource[]; notice: string | null }
+    }
     'stories.load': { input: { sourceId: string; storiesFile: string }; output: StoriesLoadResult }
     'stories.launch': {
       input: {
