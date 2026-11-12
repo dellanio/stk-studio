@@ -1,0 +1,12 @@
+{
+  "manifestVersion": 2,
+  "execution": "trusted-worker",
+  "id": "aidlc",
+  "name": "STK AIDLC",
+  "version": "0.1.0",
+  "description": "AI-DLC no STK Studio: painel do dev, Caixa de Entrada do PO e histórias para o Jira.",
+  "engines": { "orca": ">=1.4.248" },
+  "pluginApi": 1,
+  "main": "src/worker/worker.ts",
+  "contributes": {}
+}

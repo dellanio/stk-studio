@@ -1,0 +1,18 @@
+{
+  "version": 1,
+  "delegations": [
+    {
+      "id": "d-0001",
+      "questionsFile": "inception/requirements/requirement-verification-questions.md",
+      "questionId": "Q2",
+      "questionTitle": "What is the approval chain for a request?",
+      "phase": "inception",
+      "stage": "requirements",
+      "requestedBy": "Dev Demo",
+      "assignedTo": "PO Demo",
+      "requestedAt": "2026-11-11T14:00:00.000Z",
+      "note": "Só o PO sabe se o financeiro aprova também.",
+      "status": "pending"
+    }
+  ]
+}
