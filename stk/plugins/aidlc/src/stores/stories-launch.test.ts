@@ -82,17 +82,22 @@ test('Cloud: ADF description with the criteria, epic as parent', () => {
   const fields = buildIssueFields(config, 'story', story)
   assert.deepEqual(fields.parent, { key: 'FIN-1' })
   assert.equal(fields.customfield_10008, undefined)
-  const description = fields.description as {
-    content: { type: string; content?: { text?: string }[] }[]
-  }
-  assert.deepEqual(
-    description.content.map((node) => [node.type, node.content?.[0]?.text ?? null]),
-    [
-      ['paragraph', 'D'],
-      ['paragraph', 'Critérios de aceite:'],
-      ['bulletList', null]
+  const paragraph = (text: string) => ({ type: 'paragraph', content: [{ type: 'text', text }] })
+  assert.deepEqual(fields.description, {
+    type: 'doc',
+    version: 1,
+    content: [
+      paragraph('D'),
+      paragraph('Critérios de aceite:'),
+      {
+        type: 'bulletList',
+        content: [
+          { type: 'listItem', content: [paragraph('C1')] },
+          { type: 'listItem', content: [paragraph('C2')] }
+        ]
+      }
     ]
-  )
+  })
 })
 
 test('Data Center: wiki text, Epic Link field, criteria in their own field', () => {

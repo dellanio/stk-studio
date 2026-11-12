@@ -1,5 +1,6 @@
 // JiraClient: what "Lançar no Jira" needs, with a REST implementation (Cloud v3 / Data Center v2)
 // and a fake. Orca's native Jira integration (src/main/jira) is not reachable from plugins.
+import { isRecord, stringOf } from '../domain/json-value'
 import type { HttpFetch } from '../sources/github-file-source'
 
 export type JiraDeployment = 'cloud' | 'datacenter'
@@ -40,7 +41,7 @@ export class JiraApiError extends Error {
   readonly code = 'jira_error'
 }
 
-type AdfNode = { type: string; content?: AdfNode[]; text?: string }
+type AdfNode = { type: string; version?: number; content?: AdfNode[]; text?: string }
 
 function adfDocument(description: string, bullets: string[]): AdfNode {
   const content: AdfNode[] = description
@@ -57,7 +58,7 @@ function adfDocument(description: string, bullets: string[]): AdfNode {
       }))
     })
   }
-  return { type: 'doc', version: 1, content } as AdfNode
+  return { type: 'doc', version: 1, content }
 }
 
 const wikiList = (items: string[]): string => items.map((item) => `* ${item}`).join('\n')
@@ -111,10 +112,13 @@ function authorization(config: JiraConfig): string {
 async function errorText(response: { text(): Promise<string> }): Promise<string> {
   const body = await response.text()
   try {
-    const parsed = JSON.parse(body) as { errorMessages?: string[]; errors?: Record<string, string> }
+    const parsed: unknown = JSON.parse(body)
+    const messages =
+      isRecord(parsed) && Array.isArray(parsed.errorMessages) ? parsed.errorMessages : []
+    const errors = isRecord(parsed) && isRecord(parsed.errors) ? parsed.errors : {}
     const parts = [
-      ...(parsed.errorMessages ?? []),
-      ...Object.entries(parsed.errors ?? {}).map(([key, value]) => `${key}: ${value}`)
+      ...messages.map(String),
+      ...Object.entries(errors).map(([key, value]) => `${key}: ${String(value)}`)
     ]
     return parts.join('; ') || body.slice(0, 300)
   } catch {
@@ -123,7 +127,7 @@ async function errorText(response: { text(): Promise<string> }): Promise<string>
 }
 
 export function createRestJiraClient(config: JiraConfig, fetchImpl?: HttpFetch): JiraClient {
-  const http: HttpFetch = fetchImpl ?? (globalThis.fetch as unknown as HttpFetch)
+  const http: HttpFetch = fetchImpl ?? globalThis.fetch
   const base = config.baseUrl.replace(/\/+$/, '')
   const api = `${base}/rest/api/${config.deployment === 'cloud' ? '3' : '2'}/issue`
 
@@ -145,8 +149,12 @@ export function createRestJiraClient(config: JiraConfig, fetchImpl?: HttpFetch):
     if (!response.ok) {
       throw new JiraApiError(`Jira recusou (${response.status}): ${await errorText(response)}`)
     }
-    const data = (await response.json()) as { key: string }
-    return { key: data.key, url: `${base}/browse/${data.key}` }
+    const data: unknown = await response.json()
+    const key = isRecord(data) ? stringOf(data.key) : undefined
+    if (!key) {
+      throw new JiraApiError('Jira não devolveu a chave da issue criada.')
+    }
+    return { key, url: `${base}/browse/${key}` }
   }
 
   return {

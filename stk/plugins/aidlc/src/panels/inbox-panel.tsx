@@ -114,7 +114,7 @@ function PendingItem({ item }: { item: InboxItem }) {
           <RelativeTime at={Date.parse(item.delegation.requestedAt)} format="duration" />
         </Text>
         {item.delegation.note ? (
-          <Callout tone="neutral" icon="info">
+          <Callout tone="neutral" icon="info" title="Observação do dev">
             {item.delegation.note}
           </Callout>
         ) : null}
@@ -337,7 +337,7 @@ export default function InboxPanel() {
           <Tab value="projects" label="Projetos" icon="folder">
             <ProjectsTab result={result} />
           </Tab>
-          <Tab value="config" label="Configurar" icon="settings">
+          <Tab value="config" label="Ajustes" icon="settings">
             <ConfigTab />
           </Tab>
         </Tabs>

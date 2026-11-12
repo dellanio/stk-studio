@@ -2,11 +2,11 @@
 
 Plugin do STK Studio para o AI-DLC (C17–C19): painel do dev, Caixa de Entrada do PO e histórias → Jira. Perfil `trusted-worker`: o worker faz arquivos, git e rede; os painéis TSX não têm rede.
 
-| Painel | Para quem | O que faz |
-|---|---|---|
-| **AIDLC** | Dev | Fases e etapas de `aidlc-state.md`, perguntas pendentes com formulário (A–E, múltipla escolha, X com texto livre), "Enviar ao PO", "Avisar o agente para reler", artefatos e delegações |
-| **Caixa de Entrada** | PO | Perguntas enviadas pelos devs em todos os projetos configurados, lidas e respondidas pela API do GitHub (sem clonar); status das fases; tokens |
-| **Histórias → Jira** | PO/Dev | Revisão, edição e seleção das histórias do inception; "Lançar no Jira" cria épico (opcional) e histórias e grava as chaves no `stories.md` |
+| Painel               | Para quem | O que faz                                                                                                                                                                               |
+| -------------------- | --------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| **AIDLC**            | Dev       | Fases e etapas de `aidlc-state.md`, perguntas pendentes com formulário (A–E, múltipla escolha, X com texto livre), "Enviar ao PO", "Avisar o agente para reler", artefatos e delegações |
+| **Caixa de Entrada** | PO        | Perguntas enviadas pelos devs em todos os projetos configurados, lidas e respondidas pela API do GitHub (sem clonar); status das fases; tokens                                          |
+| **Histórias → Jira** | PO/Dev    | Revisão, edição e seleção das histórias do inception; "Lançar no Jira" cria épico (opcional) e histórias e grava as chaves no `stories.md`                                              |
 
 Formatos suportados e suposições: [`stk/docs/aidlc-formatos.md`](../../docs/aidlc-formatos.md).
 
@@ -38,6 +38,6 @@ Na instalação por pasta, a identidade é `local.aidlc`; no catálogo F2A, o pu
 
 ## Configuração
 
-Configurações → Plugins → STK AIDLC: seu nome, PO padrão, push automático, versão do formato, projetos do PO (`owner/repo@branch` por linha), URL da API do GitHub, intervalo de verificação, modo demonstração e campos do Jira. Tokens do GitHub e do Jira ficam nos **secrets do plugin** (aba Configurar da Caixa de Entrada), nunca em configurações ou arquivos.
+Configurações → Plugins → STK AIDLC: seu nome, PO padrão, push automático, versão do formato, projetos do PO (`owner/repo@branch` por linha), URL da API do GitHub, intervalo de verificação, modo demonstração e campos do Jira. Tokens do GitHub e do Jira ficam nos **secrets do plugin** (aba Ajustes da Caixa de Entrada), nunca em configurações ou arquivos.
 
 **Modo demonstração:** GitHub e Jira simulados em memória com dois projetos de exemplo (`demo/reembolso-v1@main`, `demo/reembolso-v2@main`, a partir de `fixtures/`). Nada sai da máquina; as respostas somem quando o worker reinicia.

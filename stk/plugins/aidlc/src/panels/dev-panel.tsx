@@ -373,7 +373,7 @@ export default function DevPanel() {
             <Tab value="progress" label="Progresso" icon="activity">
               <ProgressTab result={result} />
             </Tab>
-            <Tab value="artifacts" label="Artefatos" icon="file-text">
+            <Tab value="artifacts" label="Arquivos" icon="file-text">
               <ArtifactsTab
                 result={result}
                 onOpen={(path) =>

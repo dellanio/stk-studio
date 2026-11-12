@@ -12,8 +12,6 @@ import {
   Heading,
   IconButton,
   Input,
-  List,
-  ListItem,
   plugin,
   read,
   Row,
@@ -191,14 +189,19 @@ function StoryCard({ story }: { story: AidlcStory }) {
         </Row>
         {edit.description ? <Text size="sm">{edit.description}</Text> : null}
         {edit.criteria ? (
-          <List label="Critérios de aceite">
+          <Stack gap="xs">
+            <Text size="sm" weight="medium">
+              Critérios de aceite
+            </Text>
             {edit.criteria
               .split('\n')
               .filter((line) => line.trim())
-              .map((line, index) => (
-                <ListItem key={String(index)} icon="check" title={line} />
+              .map((line) => (
+                <Text key={line} size="sm" muted>
+                  {`• ${line}`}
+                </Text>
               ))}
-          </List>
+          </Stack>
         ) : (
           <Text size="sm" tone="warning">
             Sem critérios de aceite.

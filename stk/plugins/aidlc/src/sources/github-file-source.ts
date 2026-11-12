@@ -1,5 +1,6 @@
 // A repository read and written through the GitHub REST API (contents + trees), so the PO never
 // clones. Each write is one commit authored by the token's owner.
+import { isRecord, stringOf } from '../domain/json-value'
 import {
   SourceConflictError,
   type RecordFileSource,
@@ -40,6 +41,16 @@ export function projectLabel(project: GitHubProject): string {
   return `${project.owner}/${project.repo}@${project.branch}`
 }
 
+/** `path` of each `{ path, type }` entry of that type, from a trees or contents API answer. */
+function pathsOfType(entries: unknown, type: string): string[] {
+  if (!Array.isArray(entries)) {
+    return []
+  }
+  return entries.flatMap((entry) =>
+    isRecord(entry) && entry.type === type && typeof entry.path === 'string' ? [entry.path] : []
+  )
+}
+
 const encodePath = (path: string): string => path.split('/').map(encodeURIComponent).join('/')
 
 function decodeBase64(value: string): string {
@@ -66,7 +77,7 @@ function describe(status: number, project: GitHubProject): string {
 export function createGitHubFileSource(options: GitHubSourceOptions): RecordFileSource {
   const { project, token } = options
   const apiUrl = (options.apiUrl ?? 'https://api.github.com').replace(/\/+$/, '')
-  const http: HttpFetch = options.fetch ?? (globalThis.fetch as unknown as HttpFetch)
+  const http: HttpFetch = options.fetch ?? globalThis.fetch
   const repoUrl = `${apiUrl}/repos/${encodeURIComponent(project.owner)}/${encodeURIComponent(project.repo)}`
   let tree: Promise<string[] | null> | null = null
 
@@ -93,14 +104,11 @@ export function createGitHubFileSource(options: GitHubSourceOptions): RecordFile
     if (!response.ok) {
       throw new GitHubApiError(describe(response.status, project), response.status)
     }
-    const data = (await response.json()) as {
-      truncated?: boolean
-      tree?: { path: string; type: string }[]
-    }
-    if (data.truncated) {
+    const data: unknown = await response.json()
+    if (!isRecord(data) || data.truncated === true) {
       return null
     }
-    return (data.tree ?? []).filter((entry) => entry.type === 'blob').map((entry) => entry.path)
+    return pathsOfType(data.tree, 'blob')
   }
 
   async function walkContents(dir: string, into: string[]): Promise<void> {
@@ -114,14 +122,11 @@ export function createGitHubFileSource(options: GitHubSourceOptions): RecordFile
     if (!response.ok) {
       throw new GitHubApiError(describe(response.status, project), response.status)
     }
-    const entries = (await response.json()) as { path: string; type: string }[]
-    for (const entry of Array.isArray(entries) ? entries : []) {
-      if (entry.type === 'dir') {
-        await walkContents(entry.path, into)
-      } else if (entry.type === 'file') {
-        into.push(entry.path)
-      }
+    const entries: unknown = await response.json()
+    for (const subdir of pathsOfType(entries, 'dir')) {
+      await walkContents(subdir, into)
     }
+    into.push(...pathsOfType(entries, 'file'))
   }
 
   return {
@@ -148,8 +153,14 @@ export function createGitHubFileSource(options: GitHubSourceOptions): RecordFile
       if (!response.ok) {
         throw new GitHubApiError(describe(response.status, project), response.status)
       }
-      const data = (await response.json()) as { content?: string; sha: string }
-      return { content: decodeBase64(data.content ?? ''), version: data.sha }
+      const data: unknown = await response.json()
+      if (!isRecord(data)) {
+        throw new GitHubApiError(describe(response.status, project), response.status)
+      }
+      return {
+        content: decodeBase64(stringOf(data.content) ?? ''),
+        version: stringOf(data.sha) ?? ''
+      }
     },
     async writeFile(path, content, { message, expectedVersion }) {
       const response = await call('PUT', `${repoUrl}/contents/${encodePath(path)}`, {
@@ -165,8 +176,10 @@ export function createGitHubFileSource(options: GitHubSourceOptions): RecordFile
         throw new GitHubApiError(describe(response.status, project), response.status)
       }
       tree = null
-      const data = (await response.json()) as { content?: { sha?: string } }
-      return { content, version: data.content?.sha ?? '' }
+      const data: unknown = await response.json()
+      const written =
+        isRecord(data) && isRecord(data.content) ? stringOf(data.content.sha) : undefined
+      return { content, version: written ?? '' }
     }
   }
 }

@@ -57,7 +57,7 @@ export async function projectSources(
   }
   const token = await readSecret(orca, 'githubToken')
   if (!token) {
-    throw new UserFacingError('Informe o token do GitHub na aba Configurar da Caixa de Entrada.')
+    throw new UserFacingError('Informe o token do GitHub na aba Ajustes da Caixa de Entrada.')
   }
   return config.projects.map((project) =>
     createGitHubFileSource({ project, token, apiUrl: config.githubApiUrl })

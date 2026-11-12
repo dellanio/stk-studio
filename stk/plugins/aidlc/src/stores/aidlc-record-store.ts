@@ -164,18 +164,13 @@ export async function delegateQuestion(
   input: NewDelegation,
   now = new Date()
 ): Promise<Delegation> {
-  let created: Delegation | null = null
-  await updateLedger(
-    source,
-    record,
-    `aidlc: ${input.questionId} enviada a ${input.assignedTo}`,
-    (ledger) => {
-      const result = addDelegation(ledger, input, now, randomUUID)
-      created = result.delegation
-      return result.ledger
-    }
-  )
-  return created as unknown as Delegation
+  const { ledger, version } = await readLedger(source, record)
+  const result = addDelegation(ledger, input, now, randomUUID)
+  await source.writeFile(recordPath(record, DELEGATIONS_FILE), serializeLedger(result.ledger), {
+    message: `aidlc: ${input.questionId} enviada a ${input.assignedTo}`,
+    expectedVersion: version
+  })
+  return result.delegation
 }
 
 /** DelegationStore: close what the answer resolved. No write when nothing was pending. */

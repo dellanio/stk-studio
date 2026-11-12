@@ -10,6 +10,16 @@ import { projectSources, UserFacingError } from './worker-context'
 const LAST_INBOX = 'inbox.last'
 const SEEN = 'inbox.seen'
 
+/** The last refresh, which only this worker writes (as JSON text). */
+async function lastInbox(orca: OrcaWorkerApi): Promise<InboxResult | null> {
+  const stored = await orca.storage.get(LAST_INBOX)
+  if (typeof stored !== 'string') {
+    return null
+  }
+  // oxlint-disable-next-line typescript/consistent-type-assertions -- SAFETY: written only by refreshInbox from an InboxResult in this worker.
+  return JSON.parse(stored) as InboxResult
+}
+
 let pollTimer: ReturnType<typeof setTimeout> | null = null
 
 function emptyInbox(config: PluginConfig): InboxResult {
@@ -26,7 +36,8 @@ function emptyInbox(config: PluginConfig): InboxResult {
 }
 
 async function announceNew(orca: OrcaWorkerApi, result: InboxResult, notify: boolean) {
-  const seen = new Set(((await orca.storage.get(SEEN)) as string[] | null) ?? [])
+  const stored = await orca.storage.get(SEEN)
+  const seen = new Set(Array.isArray(stored) ? stored.filter((key) => typeof key === 'string') : [])
   const fresh = result.items.filter((item) => !seen.has(item.key))
   await orca.storage.set(
     SEEN,
@@ -75,7 +86,7 @@ export async function refreshInbox(orca: OrcaWorkerApi, notify: boolean): Promis
     result.errors.push(error instanceof Error ? error.message : String(error))
   }
   result.checkedAt = Date.now()
-  await orca.storage.set(LAST_INBOX, result as never)
+  await orca.storage.set(LAST_INBOX, JSON.stringify(result))
   await announceNew(orca, result, notify)
   await updateBadge(orca, result)
   orca.panels.post('inbox.changed', { pending: result.items.length })
@@ -115,7 +126,7 @@ async function configStatus(orca: OrcaWorkerApi): Promise<ConfigStatus> {
 export function registerInboxHandlers(orca: OrcaWorkerApi): void {
   orca.panels.handle('inbox.load', async ({ refresh }) => {
     if (!refresh) {
-      const last = (await orca.storage.get(LAST_INBOX)) as InboxResult | null
+      const last = await lastInbox(orca)
       const config = await readConfig(orca)
       if (last && last.demo === config.demo) {
         return last
@@ -126,7 +137,7 @@ export function registerInboxHandlers(orca: OrcaWorkerApi): void {
 
   orca.panels.handle('inbox.answer', async ({ itemKey, answer }) => {
     const config = await readConfig(orca)
-    const last = (await orca.storage.get(LAST_INBOX)) as InboxResult | null
+    const last = await lastInbox(orca)
     const item = last?.items.find((candidate) => candidate.key === itemKey)
     if (!item) {
       throw new UserFacingError(

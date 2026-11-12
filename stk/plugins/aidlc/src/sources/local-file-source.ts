@@ -1,6 +1,7 @@
 // The developer's checkout on this machine (P11: local only).
 import { mkdir, readdir, readFile, writeFile } from 'node:fs/promises'
 import { dirname, join } from 'node:path'
+import { errorCode } from '../domain/json-value'
 import {
   contentVersion,
   SourceConflictError,
@@ -11,9 +12,7 @@ import {
 const SKIPPED = new Set(['node_modules', '.git'])
 
 function isMissing(error: unknown): boolean {
-  return (
-    typeof error === 'object' && error !== null && (error as { code?: unknown }).code === 'ENOENT'
-  )
+  return errorCode(error) === 'ENOENT'
 }
 
 export function createLocalFileSource(rootDir: string, label: string): RecordFileSource {

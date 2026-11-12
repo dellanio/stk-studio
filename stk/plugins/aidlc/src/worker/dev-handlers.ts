@@ -1,6 +1,7 @@
 // Painel AIDLC do dev: read the local record, answer, delegate to the PO (commit + push), nudge
 // the agent and open artifacts.
 import type { OrcaWorkerApi } from 'orca/worker'
+import { stringOf } from '../domain/json-value'
 import type { DevLoadResult } from '../protocol'
 import {
   answerQuestion,
@@ -51,7 +52,7 @@ export async function loadDev(orca: OrcaWorkerApi, requestedRoot?: string): Prom
       notice: 'Esta workspace não tem aidlc-docs/ (nem aidlc/spaces/). Inicie o AI-DLC pelo agente.'
     }
   }
-  const stored = requestedRoot ?? ((await orca.storage.get(SELECTED_RECORD)) as string | null)
+  const stored = requestedRoot ?? stringOf(await orca.storage.get(SELECTED_RECORD))
   const record = records.find((candidate) => candidate.root === stored) ?? records[0]
   if (requestedRoot) {
     await orca.storage.set(SELECTED_RECORD, record.root)

@@ -1,5 +1,6 @@
 // The delegation ledger kept in the repository (`<record>/.stk/delegations.json`): which question
 // a developer sent to the PO, and whether it was answered. Pure; stores do the reading/writing.
+import { isRecord } from './json-value'
 
 export type DelegationStatus = 'pending' | 'answered' | 'cancelled'
 
@@ -22,26 +23,22 @@ export type Delegation = {
 
 export type DelegationLedger = { version: 1; delegations: Delegation[] }
 
+function isDelegation(item: unknown): item is Delegation {
+  return (
+    isRecord(item) &&
+    typeof item.id === 'string' &&
+    typeof item.questionsFile === 'string' &&
+    typeof item.questionId === 'string'
+  )
+}
+
 export function parseLedger(text: string | null): DelegationLedger {
   if (!text?.trim()) {
     return { version: 1, delegations: [] }
   }
   const parsed: unknown = JSON.parse(text)
-  const list =
-    typeof parsed === 'object' &&
-    parsed !== null &&
-    Array.isArray((parsed as { delegations?: unknown }).delegations)
-      ? (parsed as { delegations: unknown[] }).delegations
-      : []
-  const delegations = list.filter(
-    (item): item is Delegation =>
-      typeof item === 'object' &&
-      item !== null &&
-      typeof (item as Delegation).id === 'string' &&
-      typeof (item as Delegation).questionsFile === 'string' &&
-      typeof (item as Delegation).questionId === 'string'
-  )
-  return { version: 1, delegations }
+  const list = isRecord(parsed) && Array.isArray(parsed.delegations) ? parsed.delegations : []
+  return { version: 1, delegations: list.filter(isDelegation) }
 }
 
 export function serializeLedger(ledger: DelegationLedger): string {

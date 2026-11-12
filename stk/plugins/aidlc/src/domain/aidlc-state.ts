@@ -48,9 +48,17 @@ const STATUS_BY_MARK: Record<string, AidlcStageStatus> = {
   S: 'skipped'
 }
 
+const PHASE_BY_WORD: Record<string, AidlcPhaseId> = {
+  INITIALIZATION: 'initialization',
+  IDEATION: 'ideation',
+  INCEPTION: 'inception',
+  CONSTRUCTION: 'construction',
+  OPERATION: 'operations',
+  OPERATIONS: 'operations'
+}
+
 function phaseId(word: string): AidlcPhaseId {
-  const upper = word.toUpperCase()
-  return upper.startsWith('OPERATION') ? 'operations' : (upper.toLowerCase() as AidlcPhaseId)
+  return PHASE_BY_WORD[word.toUpperCase()] ?? 'operations'
 }
 
 function parseStage(mark: string, rest: string): AidlcStage {

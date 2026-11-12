@@ -21,7 +21,7 @@ const text = (value: unknown, fallback = ''): string =>
   typeof value === 'string' ? value.trim() : fallback
 
 export async function readConfig(orca: OrcaWorkerApi): Promise<PluginConfig> {
-  const settings = (await orca.settings.get()) as Record<string, unknown>
+  const settings: Record<string, unknown> = await orca.settings.get()
   const lines = text(settings.projects)
     .split(/\r?\n/)
     .map((line) => line.trim())

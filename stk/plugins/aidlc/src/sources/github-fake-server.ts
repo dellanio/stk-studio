@@ -1,4 +1,5 @@
 // A local stand-in for the three GitHub endpoints the source uses, for tests (no network).
+import { isRecord, stringOf } from '../domain/json-value'
 import { createServer, type IncomingMessage, type ServerResponse } from 'node:http'
 
 export type FakeGitHub = {
@@ -70,11 +71,14 @@ export async function startFakeGitHub(options: {
       return
     }
     if (req.method === 'PUT') {
-      const input = JSON.parse(body) as {
-        message: string
-        content: string
-        sha?: string
-        branch: string
+      const parsed: unknown = JSON.parse(body)
+      const field = (key: string): string | undefined =>
+        isRecord(parsed) ? stringOf(parsed[key]) : undefined
+      const input = {
+        message: field('message') ?? '',
+        content: field('content') ?? '',
+        sha: field('sha'),
+        branch: field('branch') ?? ''
       }
       if (input.branch !== options.branch) {
         send(res, 404, { message: 'Branch not found' })
