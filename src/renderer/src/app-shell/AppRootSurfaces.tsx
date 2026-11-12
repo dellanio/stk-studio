@@ -16,6 +16,7 @@ import { StarNagAgentValueMomentObserver } from '../components/star-nag/StarNagA
 import { NativeChatResumeOnRestartModal } from '../components/native-chat-recovery/NativeChatResumeRuntimeModal'
 import { StarNagToastHost } from '../components/star-nag/StarNagToastHost'
 import { TelemetryFirstLaunchSurface } from '../components/TelemetryFirstLaunchSurface'
+import { UiProfileFirstLaunchPicker } from '../components/profiles/UiProfileFirstLaunchPicker'
 import { ZoomOverlay } from '../components/ZoomOverlay'
 import { WslMoveDialogHost } from '../components/wsl-move/WslMoveDialog'
 import { MacosUpdateRequirementHost } from '../components/macos-update-requirement/MacosUpdateRequirementHost'
@@ -312,6 +313,11 @@ export const AppRootSurfaces = memo(function AppRootSurfaces(props: {
       {/* Mount once per session; the internal gate selects pre-telemetry users (telemetry-plan.md §First-launch experience). */}
       <OverlayBoundary boundaryId="overlay.telemetry-first-launch" resetKey={telemetryOptedIn}>
         <TelemetryFirstLaunchSurface />
+      </OverlayBoundary>
+      <OverlayBoundary boundaryId="overlay.ui-profile-first-launch" resetKey={activeView}>
+        <UiProfileFirstLaunchPicker
+          suppressed={Boolean(onboardingGate.onboarding && onboardingGate.shouldRender)}
+        />
       </OverlayBoundary>
       <OverlayBoundary boundaryId="overlay.zoom" resetKey={activeView}>
         <ZoomOverlay />

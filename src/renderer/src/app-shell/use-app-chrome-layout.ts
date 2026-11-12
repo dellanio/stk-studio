@@ -7,6 +7,7 @@ import { resolveLeftTitlebarChromeLayout } from '@/app-shell/chrome/titlebar-lef
 import { selectWorktreeCreationSurfaceShown } from '@/lib/workspace/creation/worktree-creation-surface'
 import { useAppStore } from '../store/index'
 import { FLOATING_TERMINAL_WORKTREE_ID } from '../../../shared/constants'
+import { isUiSurfaceVisible } from '../../../shared/ui-profiles'
 import { selectActiveTerminalChromeState } from './active-terminal-chrome-selector'
 import {
   hasRequestedBackgroundTerminalWorktreeMount,
@@ -61,11 +62,17 @@ export function useAppChromeLayout() {
   const shouldMountTerminalWorkbench = canMountTerminalWorkbenchNow || hasMountedTerminalWorkbench
   // Creation owns faux chrome throughout; retain the previous workspace without its real chrome.
   const creationLayoutActive = useAppStore(selectWorktreeCreationSurfaceShown)
+  // STK Studio profile (stk/docs/patches.md #1): hidden surfaces stay mounted, only unseen.
+  const workbenchAllowed = isUiSurfaceVisible(settings?.uiProfile, 'workspace-workbench')
   const workspaceChromeActive =
-    activeView === 'terminal' && hasActiveWorktree && !creationLayoutActive
+    activeView === 'terminal' && hasActiveWorktree && !creationLayoutActive && workbenchAllowed
+  const profileHomeActive = activeView === 'terminal' && !creationLayoutActive && !workbenchAllowed
   // Activity/Space own full pages and hide the workspace sidebar.
   const showSidebar =
-    activeView !== 'settings' && activeView !== 'activity' && activeView !== 'space'
+    activeView !== 'settings' &&
+    activeView !== 'activity' &&
+    activeView !== 'space' &&
+    isUiSurfaceVisible(settings?.uiProfile, 'workspace-sidebar')
   // Tasks/Landing keep sidebar-width chrome when open; creation suppresses stacked chrome.
   const stackedSidebarOpen =
     !workspaceChromeActive && !creationLayoutActive && showSidebar && sidebarOpen
@@ -118,6 +125,7 @@ export function useAppChromeLayout() {
     isFullScreen,
     leftSidebarStyle,
     leftTitlebarChromeLayout,
+    profileHomeActive,
     rightSidebarExplorerView,
     rightSidebarOpen,
     rightSidebarTab,

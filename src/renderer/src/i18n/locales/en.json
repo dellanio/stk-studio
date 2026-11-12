@@ -25373,5 +25373,35 @@
       "read": "Usage could not be loaded. Try Refresh again.",
       "retry": "Refresh"
     }
+  },
+  "stk": {
+    "profile": {
+      "picker": {
+        "title": "How will you use STK Studio?",
+        "description": "The profile only changes what you see, not what you can do. You can switch later in Settings → General.",
+        "continue": "Continue"
+      },
+      "home": {
+        "title": "Product Owner mode",
+        "pluginsOff": "Turn on plugins in Settings → Plugins to see your inbox.",
+        "description": "Questions sent to you, story review and project status live in the panel on the right.",
+        "missingPlugin": "Install the STK AIDLC plugin (stk/plugins/aidlc) to see your inbox.",
+        "openInbox": "Open inbox",
+        "switchToDev": "Switch to Dev mode"
+      },
+      "dev": {
+        "label": "Developer",
+        "description": "Workspaces, terminals, agents, diffs and the AIDLC panel."
+      },
+      "po": {
+        "label": "Product Owner",
+        "description": "Opens on your inbox: questions from developers, story review and phase status, without code."
+      },
+      "setting": {
+        "group": "STK Studio",
+        "title": "Profile",
+        "description": "Changes what the app shows, not what you can do. Product Owner opens on the inbox and hides workspaces, terminals and diffs."
+      }
+    }
   }
 }

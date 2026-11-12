@@ -24840,5 +24840,35 @@
       "notGitRepository": "Não é um repositório Git válido",
       "importFailed": "Não foi possível importar o repositório"
     }
+  },
+  "stk": {
+    "profile": {
+      "picker": {
+        "title": "Como você vai usar o STK Studio?",
+        "description": "O perfil muda só o que você vê, não o que você pode fazer. Dá para trocar depois em Configurações → Geral.",
+        "continue": "Continuar"
+      },
+      "home": {
+        "title": "Modo Product Owner",
+        "pluginsOff": "Ative os plugins em Configurações → Plugins para ver sua Caixa de Entrada.",
+        "description": "Perguntas enviadas a você, revisão de histórias e status dos projetos ficam no painel à direita.",
+        "missingPlugin": "Instale o plugin STK AIDLC (stk/plugins/aidlc) para ver sua Caixa de Entrada.",
+        "openInbox": "Abrir Caixa de Entrada",
+        "switchToDev": "Trocar para o modo Dev"
+      },
+      "dev": {
+        "label": "Desenvolvedor",
+        "description": "Workspaces, terminais, agentes, diffs e o painel AIDLC."
+      },
+      "po": {
+        "label": "Product Owner",
+        "description": "Abre na sua Caixa de Entrada: perguntas dos devs, revisão de histórias e status das fases, sem código."
+      },
+      "setting": {
+        "group": "STK Studio",
+        "title": "Perfil",
+        "description": "Muda o que o app mostra, não o que você pode fazer. Product Owner abre na Caixa de Entrada e esconde workspaces, terminais e diffs."
+      }
+    }
   }
 }

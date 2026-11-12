@@ -29,6 +29,7 @@ import { GeneralConfirmationsSection } from './GeneralConfirmationsSection'
 import { GeneralSearchResults } from './GeneralSearchResults'
 import { getGeneralSubPageTitle, type GeneralSubPage } from './general-sub-pages'
 import { useOpenInMenuDraft } from './OpenInMenuSetting'
+import { UI_PROFILE_SEARCH_ENTRY, UiProfileSetting } from './UiProfileSetting'
 
 export function getDesktopPlatformFromUserAgent(userAgent: string): 'darwin' | 'win32' | 'other' {
   if (userAgent.includes('Mac')) {
@@ -167,6 +168,11 @@ function GeneralRootSettings({
         : t('settings.general.worktrees.hidden', 'All hidden')
   return (
     <>
+      {matchesSettingsSearch(query, UI_PROFILE_SEARCH_ENTRY) ? (
+        <SettingsGroup title={t('stk.profile.setting.group', 'STK Studio')}>
+          <UiProfileSetting settings={settings} updateSettings={updateSettings} />
+        </SettingsGroup>
+      ) : null}
       {matchesSettingsSearch(query, tabsEntries) ? (
         <SettingsGroup title={t('settings.general.tabs.title', 'Tabs')}>
           <RecentTabOrderControl
